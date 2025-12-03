@@ -54,7 +54,7 @@ export async function GET(
         return NextResponse.json({
             ...profile,
             battleLog: battleLog,
-            upcomingChests: chests.items || []
+            upcomingChests: chests.items || [],
         });
 
     } catch (error) {

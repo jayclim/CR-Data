@@ -6,6 +6,7 @@ import { Trophy, Swords, Shield, Zap, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import SkillRadar from '@/components/SkillRadar';
 import BattleLogAnalytics from '@/components/player/BattleLogAnalytics';
+import PlayerUsageStats from '@/components/player/PlayerUsageStats';
 import metaData from '@/data/meta_snapshot.json';
 
 export default function PlayerDashboard() {
@@ -144,6 +145,13 @@ export default function PlayerDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Usage Stats */}
+          <PlayerUsageStats 
+            battles={playerData.battleLog} 
+            playerTag={playerData.tag} 
+            cardData={metaData.top_cards}
+          />
 
           {/* Radar Charts Container */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
