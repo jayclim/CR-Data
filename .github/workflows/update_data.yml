@@ -2,12 +2,12 @@ name: Update Meta Data
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight UTC
+    - cron: '0 * * * *' # Runs hourly
   workflow_dispatch: # Allows manual triggering
 
 jobs:
   update-data:
-    runs-on: self-hosted # MUST be self-hosted to use your local whitelisted IP
+    runs-on: ubuntu-latest # Using cloud runner with proxy
     permissions:
       contents: write
     steps:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Data Fetch Script
         env:
-          CR_API_KEY: ${{ secrets.CR_API_KEY }}
+          CR_PROXY_API_KEY: ${{ secrets.CR_PROXY_API_KEY }}
         run: |
           # Navigate to the script directory context if needed, or just run from root
           # The script expects to find .env relative to itself, but we are passing env var directly.
