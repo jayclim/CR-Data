@@ -29,7 +29,7 @@ CR_API_BASE = "https://proxy.royaleapi.dev/v1"
 HEADERS = {"Authorization": f"Bearer {CR_API_KEY}"}
 
 # Configuration
-PLAYER_LIMIT = 500  # Increased to 500
+PLAYER_LIMIT = 1000  # Increased to 1000
 BATTLE_LIMIT = 50
 MAX_WORKERS = 5     # Reduced to avoid rate limits with higher volume
 
@@ -148,7 +148,7 @@ def main():
         synergy_counts = Counter()
         archetype_counts = Counter()
         deck_counts = Counter()
-        deck_evo_counts = {} # { deck_tuple: Counter(evo_tuple) }
+        deck_variant_counts = {} # { deck_tuple: { (evos_tuple, heroes_tuple): {count, wins} } }
         location_counts = Counter() 
         elixir_stats = {} # { "3.1": { "wins": 10, "total": 20 } }
         total_decks = 0
@@ -225,31 +225,61 @@ def main():
                         deck_tuple = tuple(sorted(card_names))
                         deck_counts[deck_tuple] += 1
                         
-                        # Identify Evos
+                        # Identify Evos and Heroes
                         evos = []
+                        heroes = []
                         for c in deck:
-                            # Check for evolution
-                            # API might return 'evolutionLevel' > 0 or icon url with 'evo'
-                            # Let's check icon url as a fallback if level isn't there
+                            name = c["name"]
+                            card_static_info = card_map.get(name, {})
+                            
+                            # Capabilities
+                            can_be_evo = bool(card_static_info.get("evo_icon"))
+                            can_be_hero = bool(card_static_info.get("hero_icon"))
+                            
                             is_evo = False
-                            if c.get("evolutionLevel", 0) > 0:
+                            is_hero = False
+                            
+                            # Check signals from Battle Log
+                            # User specified: evolutionLevel 1 = Evo, 2 = Hero
+                            evo_level = c.get("evolutionLevel", 0)
+                            
+                            if evo_level == 1:
                                 is_evo = True
-                            elif "evo" in c.get("iconUrls", {}).get("medium", ""):
-                                is_evo = True
+                            elif evo_level == 2:
+                                is_hero = True
+                                
+                            # Fallback: check icon URL if level is 0 (just in case)
+                            if evo_level == 0:
+                                icon_url = c.get("iconUrls", {}).get("medium", "")
+                                if "evo" in icon_url:
+                                    is_evo = True
+                                elif "hero" in icon_url:
+                                    is_hero = True
+                            
+                            # Final Sanity Check: If flagged as Evo but only has Hero asset -> Hero
+                            # (This might still be useful if API is inconsistent, but the level logic should be primary)
+                            if is_evo and can_be_hero and not can_be_evo:
+                                is_evo = False
+                                is_hero = True
                                 
                             if is_evo:
-                                evos.append(c["name"])
+                                evos.append(name)
+                            elif is_hero:
+                                heroes.append(name)
                         
-                        # Always track evo variant, even if empty (No Evos)
+                        # Track variant (Evos + Heroes)
                         evo_tuple = tuple(sorted(evos))
-                        if deck_tuple not in deck_evo_counts:
-                            deck_evo_counts[deck_tuple] = {}
+                        hero_tuple = tuple(sorted(heroes))
+                        variant_key = (evo_tuple, hero_tuple)
                         
-                        if evo_tuple not in deck_evo_counts[deck_tuple]:
-                            deck_evo_counts[deck_tuple][evo_tuple] = {"count": 0, "wins": 0}
+                        if deck_tuple not in deck_variant_counts:
+                            deck_variant_counts[deck_tuple] = {}
+                        
+                        if variant_key not in deck_variant_counts[deck_tuple]:
+                            deck_variant_counts[deck_tuple][variant_key] = {"count": 0, "wins": 0}
                             
-                        deck_evo_counts[deck_tuple][evo_tuple]["count"] += 1
-                        deck_evo_counts[deck_tuple][evo_tuple]["wins"] += is_win
+                        deck_variant_counts[deck_tuple][variant_key]["count"] += 1
+                        deck_variant_counts[deck_tuple][variant_key]["wins"] += is_win
 
                     sorted_cards = sorted(card_names)
                     for i in range(len(sorted_cards)):
@@ -288,14 +318,17 @@ def main():
             deck_cards = []
             avg_elixir = 0
             
-            # Find most common evo variant for this deck
+            # Find most common variant (Evos + Heroes) for this deck
             # Sort by count (desc), then wins (desc) to break ties
             best_evos = []
-            if deck_tuple in deck_evo_counts:
+            best_heroes = []
+            
+            if deck_tuple in deck_variant_counts:
                 variants = []
-                for evo_t, stats in deck_evo_counts[deck_tuple].items():
+                for (evo_t, hero_t), stats in deck_variant_counts[deck_tuple].items():
                     variants.append({
                         "evos": evo_t,
+                        "heroes": hero_t,
                         "count": stats["count"],
                         "wins": stats["wins"]
                     })
@@ -305,12 +338,14 @@ def main():
                 
                 if variants:
                     best_evos = list(variants[0]["evos"])
+                    best_heroes = list(variants[0]["heroes"])
 
             for name in deck_tuple:
                 card_info = card_map.get(name, {"name": name, "key": "unknown", "icon": "", "elixir": 0})
                 
-                # Check if this card is an Evo in the best variant
+                # Check if this card is an Evo or Hero in the best variant
                 is_evo = name in best_evos
+                is_hero = name in best_heroes
                 
                 card_data = card_info.copy()
                 if is_evo:
@@ -318,6 +353,11 @@ def main():
                     # Use Evo icon if available
                     if card_info.get("evo_icon"):
                         card_data["icon"] = card_info["evo_icon"]
+                elif is_hero:
+                    card_data["is_hero"] = True
+                    # Use Hero icon if available
+                    if card_info.get("hero_icon"):
+                        card_data["icon"] = card_info["hero_icon"]
                 
                 deck_cards.append(card_data)
                 avg_elixir += card_info.get("elixir", 0)

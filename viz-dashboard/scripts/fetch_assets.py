@@ -59,6 +59,13 @@ def fetch_and_process_cards(session, api_base, headers):
             local_path_evo = os.path.join(CARDS_DIR, f"{key}-evo.png")
             download_image(evo_icon_url, local_path_evo)
             
+        # 3. Download Hero Icon (if available)
+        # Assuming API provides 'heroMedium' or similar for heroes
+        hero_icon_url = card.get("iconUrls", {}).get("heroMedium")
+        if hero_icon_url:
+            local_path_hero = os.path.join(CARDS_DIR, f"{key}-hero.png")
+            download_image(hero_icon_url, local_path_hero)
+
         card_map[name] = {
             "id": card["id"],
             "name": name,
@@ -67,7 +74,8 @@ def fetch_and_process_cards(session, api_base, headers):
             "type": card.get("type"),
             "rarity": card.get("rarity"),
             "icon": f"/cards/{key}.png",
-            "evo_icon": f"/cards/{key}-evo.png" if evo_icon_url else None
+            "evo_icon": f"/cards/{key}-evo.png" if evo_icon_url else None,
+            "hero_icon": f"/cards/{key}-hero.png" if hero_icon_url else None
         }
         
     logger.info(f"Processed {len(card_map)} cards and assets.")

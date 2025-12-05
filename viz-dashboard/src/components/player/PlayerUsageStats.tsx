@@ -8,10 +8,15 @@ interface Card {
   id: number;
   iconUrls: {
     medium: string;
+    evolutionMedium?: string;
+    heroMedium?: string;
   };
+  evolutionLevel?: number;
+  heroLevel?: number; // Some APIs might use this
 }
 
 interface Battle {
+  type: string;
   team: {
     tag: string;
     cards: Card[];
@@ -27,14 +32,29 @@ interface Battle {
 interface PlayerUsageStatsProps {
   battles: Battle[];
   playerTag: string;
+  cardData: any[]; // Passed from parent to help with static data if needed
 }
 
-export default function PlayerUsageStats({ battles, playerTag, cardData }: PlayerUsageStatsProps & { cardData: any[] }) {
+export default function PlayerUsageStats({ battles, playerTag, cardData }: PlayerUsageStatsProps) {
   const stats = useMemo(() => {
     if (!battles || battles.length === 0) return null;
 
+    // Filter for Ladder/PoL only to avoid non-standard modes (e.g. Mega Deck with >8 cards)
+    const validBattles = battles.filter(b => b.type === 'PvP' || b.type === 'pathOfLegend');
+    
+    if (validBattles.length === 0) return null;
+
     const cardCounts: { [key: string]: { count: number; wins: number; card: Card } } = {};
-    const deckCounts: { [key: string]: { count: number; wins: number; cards: Card[] } } = {};
+    // deckCounts: Key is sorted card names (base deck). Value tracks variants.
+    const deckCounts: { 
+      [key: string]: { 
+        count: number; 
+        wins: number; 
+        variants: { 
+          [variantKey: string]: { count: number; wins: number; cards: Card[] } 
+        } 
+      } 
+    } = {};
 
     // Create elixir lookup map
     const elixirMap = new Map<string, number>();
@@ -44,23 +64,8 @@ export default function PlayerUsageStats({ battles, playerTag, cardData }: Playe
       }
     });
 
-    battles.forEach(battle => {
+    validBattles.forEach(battle => {
       const playerTeam = battle.team.find(t => t.tag === playerTag) || battle.team[0]; 
-      // Determine win (if team[0] crowns > opponent crowns)
-      // Note: Battle log structure varies. Usually team[0] is player.
-      // We need to check the result. 
-      // Assuming simple win check: team[0].crowns > opponent.crowns
-      // But the API response usually has 'crowns'.
-      // Let's assume we can infer win from context or if it's not available, we can't calculate win rate accurately without more data.
-      // However, usually battle log has 'crowns' property on team.
-      // Let's check if we can access crowns. The interface 'Battle' above didn't have it.
-      // I need to update the interface to include crowns to calculate wins.
-      
-      // Let's assume for now we just count appearances if we can't determine win.
-      // Wait, user asked for winrate. I MUST determine win.
-      // Standard Clash Royale API battle log has:
-      // team: [{ tag, crowns, ... }], opponent: [{ tag, crowns, ... }]
-      // I need to update the interface.
       
       const playerCrowns = playerTeam.crowns || 0;
       const opponentCrowns = battle.opponent[0].crowns || 0;
@@ -78,14 +83,72 @@ export default function PlayerUsageStats({ battles, playerTag, cardData }: Playe
       });
 
       // Count Decks
-      const sortedCards = [...playerTeam.cards].sort((a, b) => a.name.localeCompare(b.name));
+      // Fix 12-card bug: Ensure we only take unique cards and max 8
+      // Sometimes API returns duplicates or extra cards?
+      const uniqueCardsMap = new Map<string, Card>();
+      playerTeam.cards.forEach(c => uniqueCardsMap.set(c.name, c));
+      
+      // If we have > 8 cards, we need a strategy. 
+      // Usually standard battles have 8. If it's a special mode (e.g. Mega Deck), it might have 18.
+      // But user said "12 cards". 
+      // Let's just take the first 8 unique cards if > 8, or maybe sort and take 8?
+      // Sorting by name ensures consistency.
+      let sortedCards = Array.from(uniqueCardsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      
+      // If > 8, it's likely a non-standard deck or bug. 
+      // User wants to fix "12 cards instead of 8". 
+      // We will slice to 8.
+      if (sortedCards.length > 8) {
+        sortedCards = sortedCards.slice(0, 8);
+      }
+      
+      if (sortedCards.length === 0) return;
+
       const deckKey = sortedCards.map(c => c.name).join(',');
       
+      // Identify Variant (Evos/Heroes)
+      // We need to construct a key that represents the specific configuration of Evos/Heroes
+      const variantKeyParts: string[] = [];
+      const processedCards = sortedCards.map(c => {
+        // Determine if Evo or Hero based on evolutionLevel
+        // Level 1 = Evo, Level 2 = Hero
+        let isEvo = false;
+        let isHero = false;
+        
+        const level = c.evolutionLevel || 0;
+        if (level === 1) isEvo = true;
+        else if (level === 2) isHero = true;
+        
+        // Fallback to icon URL if level is 0
+        if (level === 0) {
+           if (c.iconUrls?.medium?.includes('evo')) isEvo = true;
+           else if (c.iconUrls?.medium?.includes('hero')) isHero = true;
+        }
+
+        if (isEvo) variantKeyParts.push(`${c.name}:EVO`);
+        if (isHero) variantKeyParts.push(`${c.name}:HERO`);
+        
+        // Return a processed card object with the correct icon
+        let iconUrl = c.iconUrls.medium;
+        if (isEvo && c.iconUrls.evolutionMedium) iconUrl = c.iconUrls.evolutionMedium;
+        if (isHero && c.iconUrls.heroMedium) iconUrl = c.iconUrls.heroMedium;
+        
+        return { ...c, iconUrls: { ...c.iconUrls, medium: iconUrl } };
+      });
+      
+      const variantKey = variantKeyParts.sort().join('|') || 'BASE';
+
       if (!deckCounts[deckKey]) {
-        deckCounts[deckKey] = { count: 0, wins: 0, cards: sortedCards };
+        deckCounts[deckKey] = { count: 0, wins: 0, variants: {} };
       }
       deckCounts[deckKey].count++;
       if (isWin) deckCounts[deckKey].wins++;
+      
+      if (!deckCounts[deckKey].variants[variantKey]) {
+        deckCounts[deckKey].variants[variantKey] = { count: 0, wins: 0, cards: processedCards };
+      }
+      deckCounts[deckKey].variants[variantKey].count++;
+      if (isWin) deckCounts[deckKey].variants[variantKey].wins++;
     });
 
     // Find Highest Win Rate Card (min 5 battles)
@@ -134,10 +197,25 @@ export default function PlayerUsageStats({ battles, playerTag, cardData }: Playe
     let mostUsedDeckWins = 0;
     
     Object.values(deckCounts).forEach(item => {
-      if (item.count > maxDeckCount) {
+      // Tie breaker: Count > Wins
+      if (item.count > maxDeckCount || (item.count === maxDeckCount && item.wins > mostUsedDeckWins)) {
         maxDeckCount = item.count;
-        mostUsedDeck = item.cards;
         mostUsedDeckWins = item.wins;
+        
+        // Find best variant for this deck
+        let bestVariant: Card[] | null = null;
+        let maxVariantCount = -1;
+        let maxVariantWins = -1;
+        
+        Object.values(item.variants).forEach(v => {
+            if (v.count > maxVariantCount || (v.count === maxVariantCount && v.wins > maxVariantWins)) {
+                maxVariantCount = v.count;
+                maxVariantWins = v.wins;
+                bestVariant = v.cards;
+            }
+        });
+        
+        mostUsedDeck = bestVariant;
       }
     });
 
@@ -217,7 +295,7 @@ export default function PlayerUsageStats({ battles, playerTag, cardData }: Playe
       totalTowerBattles: number;
       totalBattles: number;
     };
-  }, [battles, cardData]);
+  }, [battles, cardData, playerTag]);
 
   if (!stats || !stats.bestCard || !stats.mostUsedDeck || !stats.mostUsedCard) return null;
 
@@ -315,8 +393,8 @@ export default function PlayerUsageStats({ battles, playerTag, cardData }: Playe
           </div>
         </div>
         <div className="grid grid-cols-4 gap-3">
-          {stats.mostUsedDeck.map((card) => (
-            <div key={card.id} className="relative aspect-[3/4] bg-[#0a0a0a] rounded border border-[#262626] overflow-hidden">
+          {stats.mostUsedDeck.map((card, index) => (
+            <div key={index} className="relative aspect-[3/4] bg-[#0a0a0a] rounded border border-[#262626] overflow-hidden">
               <Image
                 src={card.iconUrls.medium}
                 alt={card.name}
