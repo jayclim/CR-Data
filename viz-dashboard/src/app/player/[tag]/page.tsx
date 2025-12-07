@@ -7,6 +7,7 @@ import Link from 'next/link';
 import SkillRadar from '@/components/SkillRadar';
 import BattleLogAnalytics from '@/components/player/BattleLogAnalytics';
 import PlayerUsageStats from '@/components/player/PlayerUsageStats';
+import PlayerMatchupStats from '@/components/player/PlayerMatchupStats';
 import metaData from '@/data/meta_snapshot.json';
 
 export default function PlayerDashboard() {
@@ -146,12 +147,19 @@ export default function PlayerDashboard() {
             </div>
           </div>
 
-          {/* Usage Stats */}
+
+          {/* Usage Stats (Self) */}
           <PlayerUsageStats 
             battles={playerData.battleLog} 
             playerTag={playerData.tag} 
             cardData={metaData.top_cards}
           />
+
+           {/* Matchup Stats (Enemy) */}
+           <PlayerMatchupStats 
+             battles={playerData.battleLog} 
+             playerTag={playerData.tag} 
+           />
 
           {/* Radar Charts Container */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
