@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LineChart,
   Line,
@@ -15,11 +15,29 @@ import {
 } from 'recharts';
 import { Trophy, Swords } from 'lucide-react';
 
+import Link from 'next/link';
+
+interface Card {
+  name: string;
+  id: number;
+  iconUrls: {
+    medium: string;
+  };
+}
+
+interface Player {
+  tag: string;
+  name: string;
+  crowns: number;
+  trophyChange?: number;
+  cards: Card[];
+}
+
 interface Battle {
   type: string;
   battleTime: string;
-  team: { tag: string; crowns: number; trophyChange?: number }[];
-  opponent: { tag: string; crowns: number }[];
+  team: Player[];
+  opponent: Player[];
   gameMode: { name: string };
 }
 
@@ -29,13 +47,18 @@ interface BattleLogAnalyticsProps {
 }
 
 export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnalyticsProps) {
+  const [selectedBattleIndex, setSelectedBattleIndex] = useState<number | null>(null);
+
   if (!battles || battles.length === 0) return null;
+
+  // Filter out boat battles
+  const filteredBattles = battles.filter(b => b.gameMode.name !== 'ClanWar_BoatBattle');
 
   // Process data for charts
   let cumulativeTrophies = 0;
   
   // Filter for Ladder matches only for the Tilt Tracker
-  const trophyData = battles
+  const trophyData = filteredBattles
     .filter(b => b.type === 'PvP' && b.gameMode.name === 'Ladder' && b.team[0].trophyChange !== undefined)
     .reverse() // Oldest first
     .map((b, i) => {
@@ -51,7 +74,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
     });
 
   // Calculate Win/Loss stats (All battles)
-  const stats = battles.reduce(
+  const stats = filteredBattles.reduce(
     (acc, b) => {
       const crownsWon = b.team[0].crowns;
       const crownsLost = b.opponent[0].crowns;
@@ -95,20 +118,81 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
         </div>
         
         <div className="flex flex-wrap gap-3">
-          {battles.slice(0, 20).map((battle, i) => {
+          {filteredBattles.map((battle, i) => {
              const crownsWon = battle.team[0].crowns;
              const crownsLost = battle.opponent[0].crowns;
              const isWin = crownsWon > crownsLost;
              const isLoss = crownsWon < crownsLost;
              const isLadder = battle.gameMode.name === 'Ladder';
+             const isSelected = selectedBattleIndex === i;
              
              return (
               <div 
                 key={i} 
-                className={`w-12 h-12 rounded-lg border-b-4 flex items-center justify-center transition-transform hover:scale-105 ${getResultColor(battle)}`}
-                title={`${battle.gameMode.name} • ${isWin ? 'Win' : isLoss ? 'Loss' : 'Draw'} (${crownsWon}-${crownsLost})`}
+                onClick={() => setSelectedBattleIndex(isSelected ? null : i)}
+                className={`relative group w-12 h-12 rounded-lg border-b-4 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer ${getResultColor(battle)} ${isSelected ? 'ring-2 ring-white scale-105' : ''}`}
               >
                 {isLadder ? <Trophy className="w-5 h-5" /> : <Swords className="w-5 h-5" />}
+
+                {/* Hover Tooltip */}
+                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[300px] bg-[#1a1a1a] border border-[#333] rounded-lg shadow-xl z-50 p-4 ${isSelected ? 'block' : 'hidden group-hover:block'}`}>
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-3 pb-2 border-b border-[#333]"> 
+                        <span className="text-xs text-gray-400 font-bold uppercase">{battle.gameMode.name}</span>
+                        <span className={`text-xs font-bold ${isWin ? 'text-green-500' : isLoss ? 'text-red-500' : 'text-gray-500'}`}>
+                            {isWin ? 'Victory' : isLoss ? 'Defeat' : 'Draw'} ({crownsWon}-{crownsLost})
+                        </span>
+                    </div>
+
+                    {/* Teams */}
+                    <div className="space-y-4">
+                        {/* Our Team */}
+                        <div>
+                            <div className="text-[10px] text-blue-400 font-bold uppercase mb-1">Team</div>
+                            {battle.team.map((p, idx) => (
+                                <div key={idx} className="mb-2 last:mb-0">
+                                    <div className="flex justify-between items-center text-xs mb-1">
+                                        <Link href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-blue-400 truncate max-w-[150px] block">
+                                            {p.name}
+                                        </Link>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-yellow-500 text-[10px] font-bold">{p.crowns}</span>
+                                            <img src="/assets/crown.png" alt="crown" className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-wrap gap-0.5">
+                                        {Array.from(new Map(p.cards.map(c => [c.id, c])).values()).map((c) => (
+                                            <img key={c.id} src={c.iconUrls?.medium} className="w-6 h-auto" alt={c.name} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                         {/* Opponent Team */}
+                         <div>
+                            <div className="text-[10px] text-red-400 font-bold uppercase mb-1">Opponent</div>
+                            {battle.opponent.map((p, idx) => (
+                                <div key={idx} className="mb-2 last:mb-0">
+                                    <div className="flex justify-between items-center text-xs mb-1">
+                                        <Link href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-red-400 truncate max-w-[150px] block">
+                                            {p.name}
+                                        </Link>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-yellow-500 text-[10px] font-bold">{p.crowns}</span>
+                                            <img src="/assets/crown.png" alt="crown" className="w-3 h-3" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-wrap gap-0.5">
+                                        {Array.from(new Map(p.cards.map(c => [c.id, c])).values()).map((c) => (
+                                            <img key={c.id} src={c.iconUrls?.medium} className="w-6 h-auto" alt={c.name} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
               </div>
              );
           })}

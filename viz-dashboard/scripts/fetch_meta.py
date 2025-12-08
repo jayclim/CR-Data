@@ -1,10 +1,11 @@
 import os
 import json
-import requests
+import asyncio
+import aiohttp
 import time
 import logging
+import random
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 # Configure logging
@@ -29,9 +30,9 @@ CR_API_BASE = "https://proxy.royaleapi.dev/v1"
 HEADERS = {"Authorization": f"Bearer {CR_API_KEY}"}
 
 # Configuration
-PLAYER_LIMIT = 1000  # Increased to 1000
-BATTLE_LIMIT = 50
-MAX_WORKERS = 5     # Reduced to avoid rate limits with higher volume
+PLAYER_LIMIT = 1000  
+BATTLE_LIMIT = 100
+MAX_CONCURRENCY = 15 
 
 # Output Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,36 +51,31 @@ WIN_CONDITIONS = {
 }
 
 import fetch_assets
+import requests
 
-# ... (imports)
-
-# ... (logging config)
-
-# ... (env vars)
-
-# ... (constants)
-
-def make_request(endpoint, session, params=None):
-    # ... (keep existing)
+async def make_request(endpoint, session, params=None):
     url = f"{CR_API_BASE}/{endpoint}"
     try:
-        response = session.get(url, headers=HEADERS, params=params)
-        if response.status_code == 429:
-            logger.warning("Rate limited. Sleeping for 2 seconds...")
-            time.sleep(2)
-            return make_request(endpoint, session, params)
-        response.raise_for_status()
-        return response.json()
+        async with session.get(url, headers=HEADERS, params=params) as response:
+            if response.status == 429:
+                sleep_time = 2 + random.uniform(0, 1)
+                logger.warning(f"Rate limited. Sleeping for {sleep_time:.2f} seconds...")
+                await asyncio.sleep(sleep_time)
+                return await make_request(endpoint, session, params)
+            response.raise_for_status()
+            return await response.json()
     except Exception as e:
         logger.error(f"Request failed for {endpoint}: {e}")
         return None
 
-# Removed download_image and fetch_and_process_cards as they are now in fetch_assets.py
+def fetch_cards_sync_wrapper(api_base, headers):
+    """Wrapper to run the synchronous fetch_assets logic."""
+    with requests.Session() as session:
+        return fetch_assets.fetch_and_process_cards(session, api_base, headers)
 
-def fetch_player_battles(player_tag, session):
-    # ... (keep existing)
+async def fetch_player_battles(player_tag, session):
     encoded_tag = player_tag.replace("#", "%23")
-    data = make_request(f"players/{encoded_tag}/battlelog", session)
+    data = await make_request(f"players/{encoded_tag}/battlelog", session)
     if not data:
         return []
     
@@ -101,28 +97,40 @@ def fetch_player_battles(player_tag, session):
                 
     return valid_battles[:BATTLE_LIMIT]
 
-def main():
-    logger.info("Starting Meta Snapshot Data Pipeline...")
+async def fetch_clan_location(clan_tag, session):
+    if not clan_tag: return "Unknown"
+    encoded = clan_tag.replace("#", "%23")
+    data = await make_request(f"clans/{encoded}", session)
+    if data and "location" in data:
+        loc = data["location"]
+        if loc.get("isCountry"):
+            return loc.get("countryCode")
+        return loc.get("name") # Fallback for regions like "Europe"
+    return "Unknown"
+
+async def fetch_profile(tag, session):
+    encoded = tag.replace("#", "%23")
+    return await make_request(f"players/{encoded}", session)
+
+async def main():
+    logger.info("Starting Meta Snapshot Data Pipeline... (Async Mode)")
     
-    with requests.Session() as session:
-        # 1. Fetch Cards (using external module)
-        card_map = fetch_assets.fetch_and_process_cards(session, CR_API_BASE, HEADERS)
+    async with aiohttp.ClientSession() as session:
+        # 1. Fetch Cards
+        loop = asyncio.get_running_loop()
+        card_map = await loop.run_in_executor(None, fetch_cards_sync_wrapper, CR_API_BASE, HEADERS)
         
-        # ... (rest of main)
-        
-        # 2. Fetch Top Players (with Pagination)
+        # 2. Fetch Top Players
         logger.info(f"Fetching Top {PLAYER_LIMIT} Players...")
         top_players = []
         cursor = None
         
         while len(top_players) < PLAYER_LIMIT:
-            # API usually limits to ~30-50 items per page for PoL, let's try requesting chunks
-            # Note: The 'limit' param might be capped by the server.
             params = {"limit": 50} 
             if cursor:
                 params["after"] = cursor
                 
-            data = make_request("locations/global/pathoflegend/players", session, params)
+            data = await make_request("locations/global/pathoflegend/players", session, params)
             if not data:
                 break
                 
@@ -141,69 +149,63 @@ def main():
         top_players = top_players[:PLAYER_LIMIT]
         logger.info(f"Total Players to Analyze: {len(top_players)}")
         
-        # 3. Fetch Battles & Clan Locations
-        logger.info("Fetching battles and clan locations...")
+        # 3. Fetch Battles & Clan Locations Concurrent
+        logger.info("Fetching battles and clan locations in parallel...")
         
         card_counts = Counter()
         synergy_counts = Counter()
         archetype_counts = Counter()
         deck_counts = Counter()
-        deck_variant_counts = {} # { deck_tuple: { (evos_tuple, heroes_tuple): {count, wins} } }
+        deck_variant_counts = {} 
         location_counts = Counter() 
-        elixir_stats = {} # { "3.1": { "wins": 10, "total": 20 } }
+        elixir_stats = {} 
+        regional_archetypes = {}
         total_decks = 0
         
-        # Helper to fetch clan location
-        def fetch_clan_location(clan_tag, session):
-            if not clan_tag: return "Unknown"
-            encoded = clan_tag.replace("#", "%23")
-            data = make_request(f"clans/{encoded}", session)
-            if data and "location" in data:
-                loc = data["location"]
-                if loc.get("isCountry"):
-                    return loc.get("countryCode")
-                return loc.get("name") # Fallback for regions like "Europe"
-            return "Unknown"
+        clan_cache = {}
+        sem = asyncio.Semaphore(MAX_CONCURRENCY)
 
-        # Regional Archetype Tracking
-        regional_archetypes = {} # { "JP": {"Cycle": 10, "Beatdown": 5}, "US": {...} }
-
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            # We need to do two things per player: fetch battles AND fetch clan info
-            # To be efficient, let's bundle them or just accept the extra requests.
-            # Since we have 500 players, fetching 500 clans is another 500 requests.
-            # We should cache clan locations since many players might be in the same clan.
-            
-            clan_cache = {}
-            
-            future_to_player = {
-                executor.submit(fetch_player_battles, p["tag"], session): p 
-                for p in top_players
-            }
-            
-            completed = 0
-            for future in as_completed(future_to_player):
-                p = future_to_player[future]
-                decks = future.result()
-                completed += 1
+        async def process_player(p):
+            async with sem:
+                decks = await fetch_player_battles(p["tag"], session)
                 
-                # Determine Player Location (Cached)
                 player_loc = "Unknown"
                 clan = p.get("clan")
                 if clan:
                     tag = clan.get("tag")
                     if tag:
-                        if tag not in clan_cache:
-                            clan_cache[tag] = fetch_clan_location(tag, session)
-                        player_loc = clan_cache[tag]
-                        
+                        if tag in clan_cache:
+                             player_loc = clan_cache[tag]
+                        else:
+                             player_loc = await fetch_clan_location(tag, session)
+                             clan_cache[tag] = player_loc
+                
+                return decks, player_loc
+
+        # Launch all tasks
+        tasks = [process_player(p) for p in top_players]
+        
+        logger.info(f"Queueing {len(tasks)} player tasks...")
+        
+        completed_count = 0
+        total_tasks = len(tasks)
+        
+        # Use as_completed for progress updates
+        for future in asyncio.as_completed(tasks):
+            try:
+                decks, player_loc = await future
+                completed_count += 1
+                
+                if completed_count % 50 == 0:
+                    logger.info(f"Processed {completed_count}/{total_tasks} players ({(completed_count/total_tasks)*100:.1f}%)")
+
                 if player_loc and player_loc != "Unknown":
                     location_counts[player_loc] += 1
                     if player_loc not in regional_archetypes:
                         regional_archetypes[player_loc] = Counter()
 
-                # Process Decks
                 for battle_record in decks:
+                    # ... Data Processing Logic ...
                     if not battle_record: continue
                     deck = battle_record["cards"]
                     is_win = battle_record["win"]
@@ -232,15 +234,12 @@ def main():
                             name = c["name"]
                             card_static_info = card_map.get(name, {})
                             
-                            # Capabilities
                             can_be_evo = bool(card_static_info.get("evo_icon"))
                             can_be_hero = bool(card_static_info.get("hero_icon"))
                             
                             is_evo = False
                             is_hero = False
                             
-                            # Check signals from Battle Log
-                            # User specified: evolutionLevel 1 = Evo, 2 = Hero
                             evo_level = c.get("evolutionLevel", 0)
                             
                             if evo_level == 1:
@@ -248,7 +247,6 @@ def main():
                             elif evo_level == 2:
                                 is_hero = True
                                 
-                            # Fallback: check icon URL if level is 0 (just in case)
                             if evo_level == 0:
                                 icon_url = c.get("iconUrls", {}).get("medium", "")
                                 if "evo" in icon_url:
@@ -256,8 +254,6 @@ def main():
                                 elif "hero" in icon_url:
                                     is_hero = True
                             
-                            # Final Sanity Check: If flagged as Evo but only has Hero asset -> Hero
-                            # (This might still be useful if API is inconsistent, but the level logic should be primary)
                             if is_evo and can_be_hero and not can_be_evo:
                                 is_evo = False
                                 is_hero = True
@@ -267,7 +263,6 @@ def main():
                             elif is_hero:
                                 heroes.append(name)
                         
-                        # Track variant (Evos + Heroes)
                         evo_tuple = tuple(sorted(evos))
                         hero_tuple = tuple(sorted(heroes))
                         variant_key = (evo_tuple, hero_tuple)
@@ -294,19 +289,18 @@ def main():
                     archetype_counts[detected] += 1
                     total_decks += 1
                     
-                    # Link Archetype to Region
                     if player_loc and player_loc != "Unknown" and detected != "Unknown":
                         regional_archetypes[player_loc][detected] += 1
-                
-                if completed % 20 == 0:
-                    logger.info(f"Processed {completed}/{len(top_players)} players...")
 
+            except Exception as e:
+                logger.error(f"Error processing player: {e}")
+        
         logger.info(f"Analysis Complete. Analyzed {total_decks} decks.")
         
         # 3.5 Fetch Leaderboards
         clan_leaderboard = []
         try:
-            clans_data = make_request("locations/57000000/rankings/clans", session, {"limit": 5})
+            clans_data = await make_request("locations/57000000/rankings/clans", session, {"limit": 5})
             if clans_data:
                 clan_leaderboard = clans_data.get("items", [])
         except Exception as e:
@@ -318,8 +312,6 @@ def main():
             deck_cards = []
             avg_elixir = 0
             
-            # Find most common variant (Evos + Heroes) for this deck
-            # Sort by count (desc), then wins (desc) to break ties
             best_evos = []
             best_heroes = []
             
@@ -333,7 +325,6 @@ def main():
                         "wins": stats["wins"]
                     })
                 
-                # Sort: primary key count (desc), secondary key wins (desc)
                 variants.sort(key=lambda x: (x["count"], x["wins"]), reverse=True)
                 
                 if variants:
@@ -343,19 +334,16 @@ def main():
             for name in deck_tuple:
                 card_info = card_map.get(name, {"name": name, "key": "unknown", "icon": "", "elixir": 0})
                 
-                # Check if this card is an Evo or Hero in the best variant
                 is_evo = name in best_evos
                 is_hero = name in best_heroes
                 
                 card_data = card_info.copy()
                 if is_evo:
                     card_data["is_evo"] = True
-                    # Use Evo icon if available
                     if card_info.get("evo_icon"):
                         card_data["icon"] = card_info["evo_icon"]
                 elif is_hero:
                     card_data["is_hero"] = True
-                    # Use Hero icon if available
                     if card_info.get("hero_icon"):
                         card_data["icon"] = card_info["hero_icon"]
                 
@@ -380,7 +368,6 @@ def main():
                 "win_rate": round(45 + (count % 15), 2)
             })
 
-            
         top_synergies = []
         for pair, count in synergy_counts.most_common(100):
             c1_name, c2_name = pair.split(" + ")
@@ -394,19 +381,17 @@ def main():
             })
             
         archetypes = []
-        for arch, count in archetype_counts.most_common():
+        for arch, counts in archetype_counts.most_common():
             archetypes.append({
                 "name": arch,
-                "count": count,
-                "share": round((count / total_decks) * 100, 2)
+                "count": counts,
+                "share": round((counts / total_decks) * 100, 2)
             })
 
-        # Format locations for map
         player_locations = []
         for code, count in location_counts.most_common():
             player_locations.append({"id": code, "value": count})
 
-        # 5. Calculate Elixir Efficiency Heatmap Data
         efficiency_stats = {} 
         heatmap_data = []
         type_cost_map = {} 
@@ -450,29 +435,18 @@ def main():
                     "cards": data["cards"][:3] 
                 })
 
-        # 5. Format Deck Elixir Stats (New Granular Data)
         deck_elixir_data = []
         for cost, stats in elixir_stats.items():
-            if stats["total"] > 10: # Filter low sample sizes
+            if stats["total"] > 10: 
                 win_rate = round((stats["wins"] / stats["total"]) * 100, 1)
                 deck_elixir_data.append({
                     "elixir": float(cost),
                     "win_rate": win_rate,
                     "count": stats["total"]
                 })
-        
-        # Sort by elixir cost
         deck_elixir_data.sort(key=lambda x: x["elixir"])
 
-        # 6. Calculate Global Averages for Radar Chart
-        # We need to fetch full player profiles to get these stats.
-        # Since we didn't fetch them in the main loop (only battles), we can't calculate exact averages for THIS run without refactoring.
-        # HOWEVER, to save time/requests, let's just fetch a sample of the top 5 players fully to get a baseline, 
-        # OR refactor the main loop to fetch profiles.
-        # Given the requirement, let's refactor the main loop to fetch profiles.
-        # But I can't easily refactor the whole loop in this replace block.
-        # So I will add a separate quick fetch for the top 50 players to get a "representative" average.
-        
+        # 6. Global Averages (Fetch Sample of 50)
         logger.info("Fetching player profiles for averages (Sample of 50)...")
         global_stats = {
             "wins": [],
@@ -482,26 +456,19 @@ def main():
             "challengeCardsWon": []
         }
         
-        # Helper to fetch profile
-        def fetch_profile(tag, session):
-            encoded = tag.replace("#", "%23")
-            return make_request(f"players/{encoded}", session)
+        sample_players = top_players[:50]
+        # Async fetch profiles
+        profile_tasks = [fetch_profile(p["tag"], session) for p in sample_players]
+        profile_results = await asyncio.gather(*profile_tasks)
+        
+        for data in profile_results:
+            if data:
+                global_stats["wins"].append(data.get("wins", 0))
+                global_stats["threeCrownWins"].append(data.get("threeCrownWins", 0))
+                global_stats["bestTrophies"].append(data.get("bestTrophies", 0))
+                global_stats["warDayWins"].append(data.get("warDayWins", 0))
+                global_stats["challengeCardsWon"].append(data.get("challengeCardsWon", 0))
 
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            # Sample top 50 for averages to avoid 500 extra requests
-            sample_players = top_players[:50]
-            future_to_p = {executor.submit(fetch_profile, p["tag"], session): p for p in sample_players}
-            
-            for future in as_completed(future_to_p):
-                data = future.result()
-                if data:
-                    global_stats["wins"].append(data.get("wins", 0))
-                    global_stats["threeCrownWins"].append(data.get("threeCrownWins", 0))
-                    global_stats["bestTrophies"].append(data.get("bestTrophies", 0))
-                    global_stats["warDayWins"].append(data.get("warDayWins", 0))
-                    global_stats["challengeCardsWon"].append(data.get("challengeCardsWon", 0))
-
-        # Helper for Q3 (75th percentile)
         def get_q3(values):
             if not values: return 0
             sorted_vals = sorted(values)
@@ -524,12 +491,9 @@ def main():
         }
         
         logger.info(f"Global Averages: {global_averages}")
-        logger.info(f"Global Q3: {global_q3}")
 
-        # Format Regional Archetypes
         formatted_regions = {}
         for region, counts in regional_archetypes.items():
-            # Only include regions with significant data
             if sum(counts.values()) > 20:
                 formatted_regions[region] = dict(counts.most_common())
 
@@ -543,8 +507,8 @@ def main():
             "archetypes": archetypes,
             "player_locations": player_locations,
             "regional_archetypes": formatted_regions,
-            "elixir_heatmap": heatmap_data, # Keeping old one just in case
-            "deck_elixir_stats": deck_elixir_data, # New granular data
+            "elixir_heatmap": heatmap_data, 
+            "deck_elixir_stats": deck_elixir_data, 
             "global_averages": global_averages,
             "global_q3": global_q3,
             "leaderboards": {
@@ -552,22 +516,6 @@ def main():
                 "clans": clan_leaderboard
             }
         }
-
-        # 7. Aggregate Regional Archetypes
-        # We need to re-process the data we collected to map Region -> Archetype
-        # Since we didn't store the link between player -> deck -> region explicitly in a list,
-        # we can't easily do it post-hoc without refactoring without refactoring the main loop.
-        # Let's do a quick pass if we can, or better yet, let's just add it to the main loop next time.
-        # For now, let's mock it or try to reconstruct it if we had the data.
-        # Actually, let's Refactor the main loop slightly to store this.
-        # ... (Refactoring main loop is risky in a replace block).
-        # Alternative: We have `location_counts` and `archetype_counts`, but no cross-reference.
-        # Let's add a simple "Regional Meta" section based on the top 5 regions.
-        # We will need to update the main loop to capture this.
-        
-        # NOTE: For this specific run, I will add the logic to the MAIN LOOP in a separate edit 
-        # to ensure we capture Region -> Archetype mapping correctly.
-        # This block just sets up the output structure.
         
         os.makedirs(DATA_DIR, exist_ok=True)
         output_file = os.path.join(DATA_DIR, "meta_snapshot.json")
@@ -578,4 +526,4 @@ def main():
         logger.info(f"Data saved to {output_file}")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
