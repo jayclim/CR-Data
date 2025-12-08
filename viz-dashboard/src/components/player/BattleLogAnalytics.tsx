@@ -52,14 +52,14 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
   if (!battles || battles.length === 0) return null;
 
   // Filter out boat battles
-  const filteredBattles = battles.filter(b => b.gameMode.name !== 'ClanWar_BoatBattle');
+  const filteredBattles = battles.filter(b => b.gameMode?.name !== 'ClanWar_BoatBattle');
 
   // Process data for charts
   let cumulativeTrophies = 0;
   
   // Filter for Ladder matches only for the Tilt Tracker
   const trophyData = filteredBattles
-    .filter(b => b.type === 'PvP' && b.gameMode.name === 'Ladder' && b.team[0].trophyChange !== undefined)
+    .filter(b => b.type === 'PvP' && b.gameMode?.name === 'Ladder' && b.team[0].trophyChange !== undefined)
     .reverse() // Oldest first
     .map((b, i) => {
       const change = b.team[0].trophyChange || 0;
@@ -68,7 +68,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
         index: i + 1,
         change: change,
         cumulative: cumulativeTrophies,
-        mode: b.gameMode.name,
+        mode: b.gameMode?.name || 'Unknown',
         result: change > 0 ? 'Win' : change < 0 ? 'Loss' : 'Draw'
       };
     });
@@ -123,7 +123,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
              const crownsLost = battle.opponent[0].crowns;
              const isWin = crownsWon > crownsLost;
              const isLoss = crownsWon < crownsLost;
-             const isLadder = battle.gameMode.name === 'Ladder';
+             const isLadder = battle.gameMode?.name === 'Ladder';
              const isSelected = selectedBattleIndex === i;
              
              return (
@@ -138,7 +138,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
                 <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[300px] bg-[#1a1a1a] border border-[#333] rounded-lg shadow-xl z-50 p-4 ${isSelected ? 'block' : 'hidden group-hover:block'}`}>
                     {/* Header */}
                     <div className="flex justify-between items-center mb-3 pb-2 border-b border-[#333]"> 
-                        <span className="text-xs text-gray-400 font-bold uppercase">{battle.gameMode.name}</span>
+                        <span className="text-xs text-gray-400 font-bold uppercase">{battle.gameMode?.name || 'Unknown'}</span>
                         <span className={`text-xs font-bold ${isWin ? 'text-green-500' : isLoss ? 'text-red-500' : 'text-gray-500'}`}>
                             {isWin ? 'Victory' : isLoss ? 'Defeat' : 'Draw'} ({crownsWon}-{crownsLost})
                         </span>

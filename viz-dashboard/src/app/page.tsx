@@ -10,7 +10,7 @@ export default function Home() {
   const { top_synergies, player_locations, total_players, total_decks, archetypes } = metaData;
   
   // Find top archetype
-  const topArchetype = archetypes && archetypes.length > 0 ? archetypes[0].name : "Unknown";
+  const topArchetype = archetypes && archetypes.length > 0 && archetypes[0] ? archetypes[0].name : "Unknown";
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8">

@@ -84,7 +84,9 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
     const links: GraphLink[] = [];
 
     synergies.forEach(syn => {
-      const [c1, c2] = syn.cards;
+      const [c1, c2] = syn.cards || [];
+      
+      if (!c1 || !c2) return;
       
       if (!nodesMap.has(c1.name)) {
         nodesMap.set(c1.name, { id: c1.name, name: c1.name, icon: c1.icon, val: 1 });

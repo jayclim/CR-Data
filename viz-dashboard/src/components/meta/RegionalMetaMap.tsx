@@ -298,7 +298,7 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                    />
                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                      {chartData.map((entry, index) => (
-                       <Cell key={`cell-${index}`} fill={ARCHETYPE_COLORS[entry.name] || DEFAULT_COLOR} />
+                       <Cell key={`cell-${index}`} fill={ARCHETYPE_COLORS[entry?.name || 'Unknown'] || DEFAULT_COLOR} />
                      ))}
                    </Bar>
                  </BarChart>
@@ -321,7 +321,7 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                   className="h-full" 
                   style={{ 
                     width: `${chartData.length > 0 ? (chartData[0].count / totalGames) * 100 : 0}%`,
-                    backgroundColor: chartData.length > 0 ? (ARCHETYPE_COLORS[chartData[0].name] || DEFAULT_COLOR) : DEFAULT_COLOR
+                    backgroundColor: chartData.length > 0 && chartData[0] ? (ARCHETYPE_COLORS[chartData[0]?.name || 'Unknown'] || DEFAULT_COLOR) : DEFAULT_COLOR
                   }}
                 />
               </div>

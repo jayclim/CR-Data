@@ -39,12 +39,12 @@ export default function MetaScatterPlot({ cards }: MetaScatterPlotProps) {
       return (
         <div className="bg-[#171717] border border-[#333] p-3 rounded-lg shadow-xl z-50">
           <div className="flex items-center gap-2 mb-2">
-            {card.icon && <img src={card.icon} alt={card.name} className="h-12 w-auto" />}
-            <p className="font-bold text-white">{card.name}</p>
+            {card?.icon && <img src={card.icon} alt={card.name || 'Card'} className="h-12 w-auto" />}
+            <p className="font-bold text-white">{card?.name || 'Unknown'}</p>
           </div>
           <div className="space-y-1 text-xs">
-            <p className="text-gray-400">Win Rate: <span className={card.win_rate > 50 ? 'text-green-500' : 'text-red-500'}>{card.win_rate}%</span></p>
-            <p className="text-gray-400">Usage: <span className="text-blue-400">{card.usage_rate}%</span></p>
+            <p className="text-gray-400">Win Rate: <span className={(card?.win_rate || 0) > 50 ? 'text-green-500' : 'text-red-500'}>{card?.win_rate || 0}%</span></p>
+            <p className="text-gray-400">Usage: <span className="text-blue-400">{card?.usage_rate || 0}%</span></p>
             <p className="text-gray-500 italic mt-1">
               {card.win_rate > avgWin && card.usage_rate < avgUsage ? '💎 Sleeper Pick' : 
                card.win_rate > avgWin && card.usage_rate > avgUsage ? '🔥 Meta Staple' :
