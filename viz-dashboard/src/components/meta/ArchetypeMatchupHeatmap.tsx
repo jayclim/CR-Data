@@ -14,7 +14,8 @@ interface MatchupData {
 }
 
 interface ArchetypeMatchupHeatmapProps {
-  data: MatchupData[];
+  specificData: MatchupData[];
+  genericData: MatchupData[];
 }
 
 
@@ -53,18 +54,42 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   return null;
 };
 
-export default function ArchetypeMatchupHeatmap({ data }: ArchetypeMatchupHeatmapProps) {
-  // Transform data for Recharts Scatter (which handles grids well)
-  // X = Opponent, Y = Player
-  const chartData = data.map(d => ({
-    x: d.opponent,
-    y: d.archetype,
-    z: d.win_rate, // Size/Color based on this
-    ...d
-  }));
+export default function ArchetypeMatchupHeatmap({ specificData, genericData }: ArchetypeMatchupHeatmapProps) {
+  const [viewMode, setViewMode] = React.useState<'specific' | 'generic'>('specific');
+
+  const processData = () => {
+    const sourceData = viewMode === 'specific' ? specificData : genericData;
+    
+    // 1. Get unique archetypes
+    const archetypes = Array.from(new Set(sourceData.map(d => d.archetype)));
+    
+    // 2. Sort by popularity (total games) if possible, or just usage
+    // We can infer popularity by summing 'total' for each archetype
+    const popularity: Record<string, number> = {};
+    sourceData.forEach(d => {
+        if (!popularity[d.archetype]) popularity[d.archetype] = 0;
+        popularity[d.archetype] += d.total;
+    });
+
+    let sortedArchetypes = archetypes.sort((a, b) => (popularity[b] || 0) - (popularity[a] || 0));
+
+    // 3. Filter Top 15 for Specific view to avoid clutter
+    if (viewMode === 'specific') {
+        sortedArchetypes = sortedArchetypes.slice(0, 15);
+    }
+    
+    // 4. Filter data to match sorted archetypes
+    const filteredData = sourceData.filter(d => 
+        sortedArchetypes.includes(d.archetype) && sortedArchetypes.includes(d.opponent)
+    );
+
+    return { domain: sortedArchetypes, data: filteredData };
+  };
+
+  const { domain, data } = processData();
 
   const getColor = (entry: MatchupData) => {
-    if (!entry.significant) return '#ffffffff'; // Dark inactive color for non-significant
+    if (!entry.significant) return '#262626'; // Light gray background for non-significant
     
     // 0-45 (Red), 45-55 (Gray), 55-100 (Green)
     if (entry.win_rate < 45) return '#ef4444';
@@ -73,61 +98,89 @@ export default function ArchetypeMatchupHeatmap({ data }: ArchetypeMatchupHeatma
   };
 
   const getOpacity = (significant: boolean) => {
-      if (!significant) return 0.2; // Faded for non-significant
+      if (!significant) return 1; // Solid color for filtered/background dots now
       return 1;
   };
 
   return (
-    <div className="bg-[#0a0a0a] rounded-xl border border-[#262626] p-6 h-[600px] flex flex-col">
-       <div className="flex justify-between items-start mb-6">
-           <div>
-               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                   ⚔️ Archetype Matchups
-               </h3>
-               <p className="text-gray-400 text-sm mt-1">
-                   Matrix of win rates. <span className="text-green-500">Green</span> means the row archetype wins. <span className="text-red-500">Red</span> means it loses.
-               </p>
-           </div>
-           <div className="text-right text-xs text-gray-500">
-               <p>Opacity indicates</p>
-               <p>statistical significance</p>
-           </div>
-       </div>
+    <div className="w-full bg-[#111] border border-[#262626] rounded-xl p-6">
+      <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="text-white">⚔️</span> Archetype Matchups
+            </h3>
+            <p className="text-sm text-gray-500">
+                Matrix of win rates. <span className="text-green-500 font-bold">Green</span> means the row archetype wins. <span className="text-red-500 font-bold">Red</span> means it loses.
+            </p>
+          </div>
+          
+          <div className="flex bg-[#262626] p-1 rounded-lg">
+             <button
+               onClick={() => setViewMode('specific')}
+               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                 viewMode === 'specific' 
+                   ? 'bg-[#3b82f6] text-white shadow-sm' 
+                   : 'text-gray-400 hover:text-white'
+               }`}
+             >
+               Detailed
+             </button>
+             <button
+               onClick={() => setViewMode('generic')}
+               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                 viewMode === 'generic' 
+                   ? 'bg-[#3b82f6] text-white shadow-sm' 
+                   : 'text-gray-400 hover:text-white'
+               }`}
+             >
+               Generic
+             </button>
+          </div>
+      </div>
 
-       <div className="flex-1 w-full min-h-0 relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
-              <XAxis 
-                type="category" 
-                dataKey="x" 
-                name="Opponent" 
-                interval={0}
-                tick={{ fill: '#9ca3af', fontSize: 10, textAnchor: 'end' }}
-                angle={-45}
-                allowDuplicatedCategory={false}
-              />
-              <YAxis 
-                type="category" 
-                dataKey="y" 
-                name="Archetype" 
-                interval={0}
-                tick={{ fill: '#e5e7eb', fontSize: 11, fontWeight: 'bold' }}
-                allowDuplicatedCategory={false}
-              />
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomTooltip />} />
-              <Scatter name="Matchups" data={chartData} shape="square">
-                {chartData.map((entry, index) => (
+      <div className="h-[700px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart
+            margin={{ top: 20, right: 20, bottom: 120, left: 120 }}
+          >
+            <XAxis 
+              type="category" 
+              dataKey="opponent" 
+              name="Opponent" 
+              allowDuplicatedCategory={false}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#9ca3af', fontSize: 11 }}
+              angle={-45}
+              textAnchor="end"
+              domain={domain}
+            />
+            <YAxis 
+              type="category" 
+              dataKey="archetype" 
+              name="Archetype" 
+              allowDuplicatedCategory={false}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#9ca3af', fontSize: 11 }}
+              domain={domain}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3', stroke: '#333' }} />
+            <Scatter name="Matchups" data={data} shape="square">
+              {data.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
                     fill={getColor(entry)}
-                    fillOpacity={getOpacity(entry.significant)}
-                    width={100} // Scatter cells don't strictly use width/height like bar cells, usually size is used
+                    width={100} 
                   />
-                ))}
-              </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
-       </div>
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+        <div className="text-right text-xs text-gray-600 mt-2">
+             Light gray squares indicate non-significant data
+        </div>
+      </div>
     </div>
   );
 }

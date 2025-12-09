@@ -23,8 +23,9 @@ interface RegionalData {
 }
 
 interface RegionalMetaMapProps {
-  data: RegionalData;
-  children?: React.ReactNode; // For the description text
+  specificData: RegionalData;
+  genericData: RegionalData;
+  children?: React.ReactNode; 
 }
 
 const ARCHETYPE_COLORS: { [key: string]: string } = {
@@ -39,6 +40,8 @@ const ARCHETYPE_COLORS: { [key: string]: string } = {
 };
 
 const DEFAULT_COLOR = "#6b7280";
+
+const TOP_SPECIFIC_DISPLAY_COUNT = 6;
 
 // ISO-2 to Numeric ISO Mapping for Map Matching
 // Source: https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.json
@@ -60,27 +63,30 @@ const REGION_MAPPING: { [key: string]: string } = {
 
 type ViewMode = 'global' | 'region' | 'country';
 
-export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps) {
+export default function RegionalMetaMap({ specificData, genericData, children }: RegionalMetaMapProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('global');
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null); // ISO-2
   const [searchTerm, setSearchTerm] = useState('');
+  const [dataType, setDataType] = useState<'generic' | 'specific'>('generic'); // Default to generic
 
   // 1. Aggregate Data based on View Mode
   const chartData = useMemo(() => {
-    if (!data) return [];
+    // Select correct dataset based on toggle
+    const currentData = dataType === 'generic' ? genericData : specificData;
+    if (!currentData) return [];
 
     let aggregated: { [key: string]: number } = {};
 
     if (viewMode === 'global') {
-      Object.values(data).forEach(regionCounts => {
+      Object.values(currentData).forEach(regionCounts => {
         Object.entries(regionCounts).forEach(([arch, count]) => {
           aggregated[arch] = (aggregated[arch] || 0) + count;
         });
       });
     } else if (viewMode === 'region') {
       if (selectedRegion) {
-        Object.entries(data).forEach(([countryCode, counts]) => {
+        Object.entries(currentData).forEach(([countryCode, counts]) => {
           const macro = REGION_MAPPING[countryCode] || "Rest of World";
           if (macro === selectedRegion) {
             Object.entries(counts).forEach(([arch, count]) => {
@@ -90,26 +96,55 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
         });
       }
     } else if (viewMode === 'country') {
-      if (selectedCountry && data[selectedCountry]) {
-        aggregated = data[selectedCountry];
+      if (selectedCountry && currentData[selectedCountry]) {
+        aggregated = currentData[selectedCountry];
       }
     }
 
-    return Object.entries(aggregated)
+    let sorted = Object.entries(aggregated)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-  }, [data, viewMode, selectedRegion, selectedCountry]);
+      
+    // Specific Mode Logic: Top N + Others
+    if (dataType === 'specific' && sorted.length > TOP_SPECIFIC_DISPLAY_COUNT + 1) {
+        const topN = sorted.slice(0, TOP_SPECIFIC_DISPLAY_COUNT);
+        const others = sorted.slice(TOP_SPECIFIC_DISPLAY_COUNT).reduce((acc, curr) => acc + curr.count, 0);
+        sorted = [...topN, { name: 'Others', count: others }];
+    }
+
+    return sorted;
+  }, [genericData, specificData, viewMode, selectedRegion, selectedCountry, dataType]);
 
   const totalGames = chartData.reduce((acc, curr) => acc + curr.count, 0);
 
   // Get list of available countries for dropdown
   const availableCountries = useMemo(() => {
-    return Object.keys(data).sort();
-  }, [data]);
+    return Object.keys(specificData).sort();
+  }, [specificData]);
 
   const filteredCountries = availableCountries.filter(c => 
     c.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getBarColor = (name: string) => {
+    // 1. Direct match (Generic)
+    if (ARCHETYPE_COLORS[name]) return ARCHETYPE_COLORS[name];
+
+    // 2. Keyword match (Specific contains Generic)
+    for (const key of Object.keys(ARCHETYPE_COLORS)) {
+        if (name.includes(key)) return ARCHETYPE_COLORS[key];
+    }
+
+    // 3. Specific Overrides (Common Meta Decks)
+    if (name.includes("Golem") || name.includes("Giant") || name.includes("Lava") || name.includes("Electro")) return ARCHETYPE_COLORS["Beatdown"];
+    if (name.includes("Hog") || name.includes("Miner") || name.includes("Drill") || name.includes("Barrel")) return ARCHETYPE_COLORS["Cycle"]; // Often Cycle
+    if (name.includes("Pekka") || name.includes("Mega Knight") || name.includes("Ram")) return ARCHETYPE_COLORS["Bridge Spam"]; 
+    if (name.includes("X-Bow") || name.includes("Mortar")) return ARCHETYPE_COLORS["Siege"];
+    if (name.includes("Log Bait") || name.includes("Fireball Bait")) return ARCHETYPE_COLORS["Spell Bait"];
+    if (name.includes("SplashYard")) return ARCHETYPE_COLORS["Control"];
+
+    return DEFAULT_COLOR;
+  };
 
   return (
     <div className="w-full bg-[#0a0a0a] rounded-xl border border-[#262626] p-6 flex flex-col gap-8">
@@ -131,8 +166,8 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                      geographies.map((geo) => {
                        // Map uses Numeric ISO (id), Data uses ISO-2
                        const isoNumeric = String(geo.id); 
-                       // Find matching ISO-2 from our data
-                       const iso2 = Object.keys(data).find(key => ISO2_TO_NUMERIC[key] === isoNumeric);
+                       // Find matching ISO-2 from our data (Use Specific Data for map coverage)
+                       const iso2 = Object.keys(specificData).find(key => ISO2_TO_NUMERIC[key] === isoNumeric);
                        
                        const hasData = !!iso2;
                        const isSelected = selectedCountry === iso2;
@@ -195,6 +230,32 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
 
       {/* Middle Row: Controls */}
       <div className="flex flex-col md:flex-row items-center gap-4 bg-[#171717] p-2 rounded-lg border border-[#333]">
+         {/* Data Type Toggle */}
+         <div className="flex bg-[#262626] rounded-lg p-1">
+            <button
+               onClick={() => setDataType('generic')}
+               className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all ${
+                 dataType === 'generic' 
+                   ? 'bg-blue-600 text-white shadow-lg' 
+                   : 'text-gray-400 hover:text-white'
+               }`}
+             >
+               Generic
+             </button>
+             <button
+               onClick={() => setDataType('specific')}
+               className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all ${
+                 dataType === 'specific' 
+                   ? 'bg-blue-600 text-white shadow-lg' 
+                   : 'text-gray-400 hover:text-white'
+               }`}
+             >
+               Specific
+             </button>
+         </div>
+         
+         <div className="h-6 w-px bg-[#333]" />
+
         {/* View Mode Selector */}
         <div className="flex bg-[#262626] rounded-lg p-1">
           {(['global', 'region', 'country'] as ViewMode[]).map(mode => (
@@ -288,8 +349,30 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                    <XAxis 
                       dataKey="name" 
                       stroke="#fff" 
-                      tick={{ fontSize: 12, fontWeight: 'bold' }}
+                      tick={({ x, y, payload }) => {
+                        const words = payload.value.split(' ');
+                        const lineHeight = 12;
+                        return (
+                          <g transform={`translate(${x},${y})`}>
+                            {words.map((word: string, i: number) => (
+                              <text 
+                                key={i}
+                                x={0}
+                                y={0}
+                                dy={16 + i * lineHeight}
+                                textAnchor="middle"
+                                fill="#9ca3af"
+                                fontSize={10}
+                                fontWeight="bold"
+                              >
+                                {word}
+                              </text>
+                            ))}
+                          </g>
+                        );
+                      }}
                       interval={0}
+                      height={60}
                    />
                    <YAxis hide />
                    <Tooltip 
@@ -298,7 +381,7 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                    />
                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                      {chartData.map((entry, index) => (
-                       <Cell key={`cell-${index}`} fill={ARCHETYPE_COLORS[entry?.name || 'Unknown'] || DEFAULT_COLOR} />
+                       <Cell key={`cell-${index}`} fill={getBarColor(entry?.name || 'Unknown')} />
                      ))}
                    </Bar>
                  </BarChart>
@@ -321,7 +404,7 @@ export default function RegionalMetaMap({ data, children }: RegionalMetaMapProps
                   className="h-full" 
                   style={{ 
                     width: `${chartData.length > 0 ? (chartData[0].count / totalGames) * 100 : 0}%`,
-                    backgroundColor: chartData.length > 0 && chartData[0] ? (ARCHETYPE_COLORS[chartData[0]?.name || 'Unknown'] || DEFAULT_COLOR) : DEFAULT_COLOR
+                    backgroundColor: chartData.length > 0 && chartData[0] ? getBarColor(chartData[0].name) : DEFAULT_COLOR
                   }}
                 />
               </div>

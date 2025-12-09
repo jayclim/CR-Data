@@ -39,16 +39,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "src", "data")
 CARDS_DIR = os.path.join(BASE_DIR, "public", "cards")
 
-# Win Conditions
-WIN_CONDITIONS = {
-    "Beatdown": ["Golem", "Lava Hound", "Giant", "Electro Giant", "Goblin Giant", "Royal Giant", "Elixir Golem"],
-    "Siege": ["X-Bow", "Mortar"],
-    "Control": ["Miner", "Graveyard", "Goblin Barrel", "Wall Breakers", "Skeleton Barrel"],
-    "Cycle": ["Hog Rider", "Royal Hogs", "Ram Rider", "Battle Ram"],
-    "Bridge Spam": ["P.E.K.K.A", "Mega Knight", "Elite Barbarians", "Royal Recruits"],
-    "Air": ["Balloon"],
-    "Three Musketeers": ["Three Musketeers"]
+# Card Role Definitions
+HEAVY_TANKS = {"Golem", "Lava Hound", "Electro Giant", "Goblin Giant", "Elixir Golem", "Giant", "Royal Giant"}
+SIEGE_BUILDINGS = {"X-Bow", "Mortar"}
+WIN_CONDITIONS = HEAVY_TANKS | SIEGE_BUILDINGS | {
+    "Hog Rider", "Ram Rider", "Battle Ram", "Balloon", "Graveyard", "Miner", 
+    "Goblin Barrel", "Wall Breakers", "Skeleton Barrel", "Goblin Drill", 
+    "Royal Hogs", "Three Musketeers"
 }
+
+# Feature Support Cards
+BAIT_CARDS = {"Princess", "Goblin Gang", "Rascals", "Dart Goblin", "Skeleton Army", "Spear Goblins", "Bats"}
+SPAM_CARDS = {"Bandit", "Royal Ghost", "Dark Prince", "Battle Ram", "Ram Rider", "Prince", "Elite Barbarians"}
+BUILDINGS = {"Tesla", "Inferno Tower", "Bomb Tower", "Goblin Cage", "Cannon", "Tombstone", "Furnace", "Barbarian Hut"}
+
 
 import fetch_assets
 import requests
@@ -67,6 +71,103 @@ async def make_request(endpoint, session, params=None):
     except Exception as e:
         logger.error(f"Request failed for {endpoint}: {e}")
         return None
+
+
+def determine_archetype(deck_cards):
+    """
+    Hierarchical Decision Tree for Deck Classification.
+    Returns: Archetype Name (str)
+    """
+    card_names = set(c["name"] for c in deck_cards)
+    
+    # 0. Calculate Feature Vector
+    avg_elixir = sum(c.get("elixirCost", 0) for c in deck_cards) / 8.0
+    cycle_score = sum(1 for c in deck_cards if c.get("elixirCost", 0) <= 2)
+    bait_score = sum(1 for name in card_names if name in BAIT_CARDS)
+    spam_score = sum(1 for name in card_names if name in SPAM_CARDS)
+    
+    has_heavy_tank = any(name in HEAVY_TANKS for name in card_names)
+    has_siege = any(name in SIEGE_BUILDINGS for name in card_names)
+    has_building = any(name in BUILDINGS for name in card_names)
+    
+    primary_win_cons = [name for name in card_names if name in WIN_CONDITIONS]
+    # Sort win cons by "heaviness" (approximate priority)
+    # This is a simple heuristic; heavier usually defines the deck more
+    primary_win_cons.sort(key=lambda x: 10 if x in HEAVY_TANKS else (5 if x in SIEGE_BUILDINGS else 1), reverse=True)
+    primary_win_con = primary_win_cons[0] if primary_win_cons else None
+
+    # Step 1: Beatdown (The Heavyweights)
+    if has_heavy_tank:
+        # Special check for Giant Graveyard -> Control/Beatdown Hybrid? Usually classed as Beatdown or Control.
+        # User prompt says Giant GY -> Beatdown.
+        if "Lava Hound" in card_names: return ("Lava Hound", "Beatdown")
+        if "Golem" in card_names: return ("Golem", "Beatdown")
+        if "Electro Giant" in card_names: return ("Electro Giant", "Beatdown")
+        if "Goblin Giant" in card_names: return ("Goblin Giant", "Beatdown")
+        if "Elixir Golem" in card_names: return ("Elixir Golem", "Beatdown")
+        if "Giant" in card_names: return ("Giant", "Beatdown")
+        if "Royal Giant" in card_names: return ("Royal Giant", "Beatdown")
+        return ("Beatdown", "Beatdown")
+
+    # Step 2: Siege
+    if has_siege:
+        if "X-Bow" in card_names: return ("Siege (X-Bow)", "Siege")
+        if "Mortar" in card_names:
+            if "Hog Rider" in card_names or "Miner" in card_names:
+                return ("Siege Hybrid", "Siege")
+            if bait_score >= 2:
+                return ("Siege Bait", "Siege")
+            return ("Siege (Mortar)", "Siege")
+            
+    # Step 3: Spell Bait
+    if "Goblin Barrel" in card_names or "Goblin Drill" in card_names or "Princess" in card_names:
+         if bait_score >= 2:
+             return ("Log Bait", "Spell Bait")
+    if "Three Musketeers" in card_names:
+        return ("Fireball Bait", "Spell Bait") # 3M is distinct
+
+    # Step 4: Bridge Spam
+    if "Battle Ram" in card_names or "Ram Rider" in card_names:
+        if "P.E.K.K.A" in card_names: return ("Pekka Bridge Spam", "Bridge Spam")
+        if "Mega Knight" in card_names: return ("MK Bridge Spam", "Bridge Spam")
+        if spam_score >= 2: return ("Bridge Spam", "Bridge Spam")
+    
+    if "Royal Hogs" in card_names:
+        if "Three Musketeers" in card_names: return ("Fireball Bait", "Spell Bait")
+        return ("Royal Hogs Cycle", "Cycle") # Or Split Lane
+
+    # Step 5: Cycle vs Control
+    if primary_win_con:
+        if primary_win_con == "Hog Rider":
+            if avg_elixir <= 3.1: return ("Hog Cycle", "Cycle")
+            return ("Hog Control", "Control") # ExeNado etc.
+            
+        if primary_win_con == "Balloon":
+            if avg_elixir <= 3.0: return ("Balloon Cycle", "Cycle")
+            return ("Loon Control", "Control") # Or Freeze
+
+        if primary_win_con == "Miner":
+            if "Wall Breakers" in card_names: return ("Miner WB", "Cycle")
+            if "Poison" in card_names and has_building: return ("Miner Control", "Control")
+            return ("Miner Cycle", "Cycle")
+            
+        if primary_win_con == "Graveyard":
+            return ("SplashYard", "Control") # Graveyard Control
+            
+        if primary_win_con == "Wall Breakers":
+            if "Miner" in card_names: return ("Miner WB", "Cycle")
+            if "Goblin Drill" in card_names: return ("Drill WB", "Cycle")
+            return ("Wall Breakers Cycle", "Cycle")
+
+    # Step 6: Default/Fallback
+    # Check for heavy defense without win con?
+    if "P.E.K.K.A" in card_names: return ("Pekka Control", "Control")
+    if "Mega Knight" in card_names: return ("Mega Knight Control", "Control")
+    
+    if primary_win_con:
+        return (f"{primary_win_con} (Generic)", "Control") # Fallback to Control/Cycle logic? Let's genericize.
+    
+    return ("Unknown", "Unknown")
 
 def fetch_cards_sync_wrapper(api_base, headers):
     """Wrapper to run the synchronous fetch_assets logic."""
@@ -155,13 +256,16 @@ async def main():
         
         card_counts = Counter()
         synergy_counts = Counter()
-        archetype_counts = Counter()
+        archetype_counts_specific = Counter()
+        archetype_counts_generic = Counter()
         deck_counts = Counter()
         deck_variant_counts = {} 
         location_counts = Counter()
-        matchup_stats = {} # (my_arch, opp_arch) -> {wins, total}
+        matchup_stats_specific = {} # (my, opp) -> stats
+        matchup_stats_generic = {} # (my, opp) -> stats
         elixir_stats = {} 
-        regional_archetypes = {}
+        regional_archetypes_specific = {}
+        regional_archetypes_generic = {}
         total_decks = 0
         
         clan_cache = {}
@@ -203,8 +307,12 @@ async def main():
 
                 if player_loc and player_loc != "Unknown":
                     location_counts[player_loc] += 1
-                    if player_loc not in regional_archetypes:
-                        regional_archetypes[player_loc] = Counter()
+                if player_loc and player_loc != "Unknown":
+                    location_counts[player_loc] += 1
+                    if player_loc not in regional_archetypes_specific:
+                        regional_archetypes_specific[player_loc] = Counter()
+                    if player_loc not in regional_archetypes_generic:
+                        regional_archetypes_generic[player_loc] = Counter()
 
                 for battle_record in decks:
                     # ... Data Processing Logic ...
@@ -284,39 +392,46 @@ async def main():
                         for j in range(i + 1, len(sorted_cards)):
                             pair = f"{sorted_cards[i]} + {sorted_cards[j]}"
                             synergy_counts[pair] += 1
-                    detected = "Unknown"
-                    for arch, wins in WIN_CONDITIONS.items():
-                        if any(w in card_names for w in wins):
-                            detected = arch
-                            break
-                    archetype_counts[detected] += 1
+                            synergy_counts[pair] += 1
+                    
+                    detected_specific, detected_generic = determine_archetype(deck)
+                    archetype_counts_specific[detected_specific] += 1
+                    archetype_counts_generic[detected_generic] += 1
                     total_decks += 1
                     
                     # Detect Opponent Archetype & Track Matchup
-                    if detected != "Unknown" and opp_deck:
-                        opp_names = [c["name"] for c in opp_deck]
-                        opp_arch = "Unknown"
-                        for arch, wins in WIN_CONDITIONS.items():
-                            if any(w in opp_names for w in wins):
-                                opp_arch = arch
-                                break
-                        
-                        if opp_arch != "Unknown":
-                            if (detected, opp_arch) not in matchup_stats:
-                                matchup_stats[(detected, opp_arch)] = {"wins": 0, "total": 0}
-                            matchup_stats[(detected, opp_arch)]['total'] += 1
-                            matchup_stats[(detected, opp_arch)]['wins'] += is_win
+                    if detected_specific != "Unknown" and opp_deck:
+                         opp_specific, opp_generic = determine_archetype(opp_deck)
+                         
+                         if opp_specific != "Unknown":
+                             # Specific Matchups
+                             if (detected_specific, opp_specific) not in matchup_stats_specific:
+                                 matchup_stats_specific[(detected_specific, opp_specific)] = {"wins": 0, "total": 0}
+                             matchup_stats_specific[(detected_specific, opp_specific)]['total'] += 1
+                             matchup_stats_specific[(detected_specific, opp_specific)]['wins'] += is_win
+                             
+                             # Mirror Specific
+                             opp_win = 1 - int(is_win)
+                             if (opp_specific, detected_specific) not in matchup_stats_specific:
+                                 matchup_stats_specific[(opp_specific, detected_specific)] = {"wins": 0, "total": 0}
+                             matchup_stats_specific[(opp_specific, detected_specific)]['total'] += 1
+                             matchup_stats_specific[(opp_specific, detected_specific)]['wins'] += opp_win
+                             
+                             # Generic Matchups
+                             if (detected_generic, opp_generic) not in matchup_stats_generic:
+                                 matchup_stats_generic[(detected_generic, opp_generic)] = {"wins": 0, "total": 0}
+                             matchup_stats_generic[(detected_generic, opp_generic)]['total'] += 1
+                             matchup_stats_generic[(detected_generic, opp_generic)]['wins'] += is_win
+                             
+                             # Mirror Generic
+                             if (opp_generic, detected_generic) not in matchup_stats_generic:
+                                 matchup_stats_generic[(opp_generic, detected_generic)] = {"wins": 0, "total": 0}
+                             matchup_stats_generic[(opp_generic, detected_generic)]['total'] += 1
+                             matchup_stats_generic[(opp_generic, detected_generic)]['wins'] += opp_win
 
-                            # Mirror Matchup (Opponent vs Player) for Symmetry
-                            # If Player Won (is_win=1), Opponent Lost (0). If Player Lost (0), Opponent Won (1).
-                            opp_win = 1 - int(is_win)
-                            if (opp_arch, detected) not in matchup_stats:
-                                matchup_stats[(opp_arch, detected)] = {"wins": 0, "total": 0}
-                            matchup_stats[(opp_arch, detected)]['total'] += 1
-                            matchup_stats[(opp_arch, detected)]['wins'] += opp_win
-
-                    if player_loc and player_loc != "Unknown" and detected != "Unknown":
-                        regional_archetypes[player_loc][detected] += 1
+                    if player_loc and player_loc != "Unknown" and detected_specific != "Unknown":
+                        regional_archetypes_specific[player_loc][detected_specific] += 1
+                        regional_archetypes_generic[player_loc][detected_generic] += 1
 
             except Exception as e:
                 logger.error(f"Error processing player: {e}")
@@ -406,9 +521,17 @@ async def main():
                 "synergy_rate": round((count / total_decks) * 100, 2)
             })
             
-        archetypes = []
-        for arch, counts in archetype_counts.most_common():
-            archetypes.append({
+        archetypes_specific = []
+        for arch, counts in archetype_counts_specific.most_common():
+            archetypes_specific.append({
+                "name": arch,
+                "count": counts,
+                "share": round((counts / total_decks) * 100, 2)
+            })
+            
+        archetypes_generic = []
+        for arch, counts in archetype_counts_generic.most_common():
+             archetypes_generic.append({
                 "name": arch,
                 "count": counts,
                 "share": round((counts / total_decks) * 100, 2)
@@ -518,35 +641,45 @@ async def main():
         
         logger.info(f"Global Averages: {global_averages}")
 
-        formatted_regions = {}
-        for region, counts in regional_archetypes.items():
+        formatted_regions_specific = {}
+        for region, counts in regional_archetypes_specific.items():
             if sum(counts.values()) > 20:
-                formatted_regions[region] = dict(counts.most_common())
+                formatted_regions_specific[region] = dict(counts.most_common())
+
+        formatted_regions_generic = {}
+        for region, counts in regional_archetypes_generic.items():
+            if sum(counts.values()) > 20:
+                formatted_regions_generic[region] = dict(counts.most_common())
 
         # Calculate Matchup Z-Scores
         # Baseline win rate is approx 0.5 (strictly it's the specific archetype's global win rate against the field, but 0.5 is a standard baseline for "countering")
         import math
-        processed_matchups = []
         
-        for (my_arch, opp_arch), stats in matchup_stats.items():
-            if stats['total'] < 30: continue # Minimum sample size
-            
-            p_hat = stats['wins'] / stats['total']
-            p_0 = 0.5 # Null hypothesis: 50% win rate
-            n = stats['total']
-            
-            # Z = (p_hat - p_0) / sqrt(p_0 * (1 - p_0) / n)
-            denominator = math.sqrt((p_0 * (1 - p_0)) / n)
-            z_score = (p_hat - p_0) / denominator if denominator > 0 else 0
-            
-            processed_matchups.append({
-                "archetype": my_arch,
-                "opponent": opp_arch,
-                "win_rate": round(p_hat * 100, 1),
-                "total": n,
-                "z_score": round(z_score, 2),
-                "significant": abs(z_score) > 1.96 # 95% confidence
-            })
+        def process_matchups(stats_dict):
+            processed = []
+            for (my_arch, opp_arch), stats in stats_dict.items():
+                if stats['total'] < 30: continue # Minimum sample size
+                
+                p_hat = stats['wins'] / stats['total']
+                p_0 = 0.5 # Null hypothesis: 50% win rate
+                n = stats['total']
+                
+                # Z = (p_hat - p_0) / sqrt(p_0 * (1 - p_0) / n)
+                denominator = math.sqrt((p_0 * (1 - p_0)) / n)
+                z_score = (p_hat - p_0) / denominator if denominator > 0 else 0
+                
+                processed.append({
+                    "archetype": my_arch,
+                    "opponent": opp_arch,
+                    "win_rate": round(p_hat * 100, 1),
+                    "total": n,
+                    "z_score": round(z_score, 2),
+                    "significant": abs(z_score) > 1.96 # 95% confidence
+                })
+            return processed
+
+        processed_matchups_specific = process_matchups(matchup_stats_specific)
+        processed_matchups_generic = process_matchups(matchup_stats_generic)
 
         output_data = {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -555,10 +688,16 @@ async def main():
             "top_cards": top_cards,
             "top_decks": top_decks,
             "top_synergies": top_synergies,
-            "archetypes": archetypes,
-            "archetype_matchups": processed_matchups,
+            "top_synergies": top_synergies,
+            "archetypes": archetypes_specific, # Keep "archetypes" key for backward compatibility
+            "archetypes_generic": archetypes_generic,
+            "archetype_matchups_specific": processed_matchups_specific,
+            "archetypes_generic": archetypes_generic,
+            "archetype_matchups_specific": processed_matchups_specific,
+            "archetype_matchups_generic": processed_matchups_generic,
             "player_locations": player_locations,
-            "regional_archetypes": formatted_regions,
+            "regional_archetypes_specific": formatted_regions_specific,
+            "regional_archetypes_generic": formatted_regions_generic,
             "elixir_heatmap": heatmap_data, 
             "deck_elixir_stats": deck_elixir_data, 
             "global_averages": global_averages,

@@ -109,7 +109,10 @@ export default function Home() {
 
             {/* Story 4: Regional Playstyles */}
             <section id="regional-playstyles" className="space-y-6 scroll-mt-24">
-              <RegionalMetaMap data={metaData.regional_archetypes}>
+              <RegionalMetaMap 
+                  specificData={metaData.regional_archetypes_specific || {}}
+                  genericData={metaData.regional_archetypes_generic || {}}
+              >
                 <div className="max-w-xl">
                   <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                     <span className="text-blue-500">4.</span> Regional Playstyles
@@ -126,27 +129,15 @@ export default function Home() {
 
             <div className="w-full h-px bg-[#262626]" />
 
-            {/* Story 5: Archetype Matchups */}
-            <section id="archetype-matchups" className="space-y-6 scroll-mt-24">
-              <div className="flex flex-col xl:flex-row-reverse gap-8 items-start">
-                <div className="w-full xl:w-1/3">
-                  <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                    <span className="text-red-500">5.</span> Direct Counters
-                  </h2>
-                  <p className="text-gray-400 mb-4">
-                    Is there a true &quot;Rock Paper Scissors&quot; dynamic? We analyzed thousands of battles to find which archetypes statistically counter others.
-                  </p>
-                  <p className="text-gray-500 text-sm italic">
-                    Grid cells show the win rate of the <span className="font-bold text-white">Row Archetype</span> vs the <span className="font-bold text-white">Column Opponent</span>.
-                    <br/><br/>
-                    Significant counters (Z-score &gt; 1.96) are highlighted fully opaque.
-                  </p>
-                </div>
-                <div className="w-full xl:w-2/3">
-                  <ArchetypeMatchupHeatmap data={metaData.archetype_matchups || []} />
-                </div>
-              </div>
-            </section>
+            {/* Story 5: Archetype Matchups - Full Width Row */}
+            <div className="w-full mt-12 scroll-mt-24" id="archetype-matchups">
+               <ArchetypeMatchupHeatmap 
+                  specificData={metaData.archetype_matchups_specific || []} 
+                  genericData={metaData.archetype_matchups_generic || []}
+               />
+            </div>
+            
+
           </div>
 
           {/* Sidebar Navigation */}
