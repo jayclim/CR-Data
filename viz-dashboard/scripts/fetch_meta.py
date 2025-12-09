@@ -92,6 +92,7 @@ async def fetch_player_battles(player_tag, session):
                 
                 valid_battles.append({
                     "cards": team.get("cards", []),
+                    "opponent_cards": opponent.get("cards", []),
                     "win": win
                 })
                 
@@ -157,7 +158,8 @@ async def main():
         archetype_counts = Counter()
         deck_counts = Counter()
         deck_variant_counts = {} 
-        location_counts = Counter() 
+        location_counts = Counter()
+        matchup_stats = {} # (my_arch, opp_arch) -> {wins, total}
         elixir_stats = {} 
         regional_archetypes = {}
         total_decks = 0
@@ -208,6 +210,7 @@ async def main():
                     # ... Data Processing Logic ...
                     if not battle_record: continue
                     deck = battle_record["cards"]
+                    opp_deck = battle_record.get("opponent_cards", [])
                     is_win = battle_record["win"]
                     
                     card_names = [c["name"] for c in deck]
@@ -289,6 +292,29 @@ async def main():
                     archetype_counts[detected] += 1
                     total_decks += 1
                     
+                    # Detect Opponent Archetype & Track Matchup
+                    if detected != "Unknown" and opp_deck:
+                        opp_names = [c["name"] for c in opp_deck]
+                        opp_arch = "Unknown"
+                        for arch, wins in WIN_CONDITIONS.items():
+                            if any(w in opp_names for w in wins):
+                                opp_arch = arch
+                                break
+                        
+                        if opp_arch != "Unknown":
+                            if (detected, opp_arch) not in matchup_stats:
+                                matchup_stats[(detected, opp_arch)] = {"wins": 0, "total": 0}
+                            matchup_stats[(detected, opp_arch)]['total'] += 1
+                            matchup_stats[(detected, opp_arch)]['wins'] += is_win
+
+                            # Mirror Matchup (Opponent vs Player) for Symmetry
+                            # If Player Won (is_win=1), Opponent Lost (0). If Player Lost (0), Opponent Won (1).
+                            opp_win = 1 - int(is_win)
+                            if (opp_arch, detected) not in matchup_stats:
+                                matchup_stats[(opp_arch, detected)] = {"wins": 0, "total": 0}
+                            matchup_stats[(opp_arch, detected)]['total'] += 1
+                            matchup_stats[(opp_arch, detected)]['wins'] += opp_win
+
                     if player_loc and player_loc != "Unknown" and detected != "Unknown":
                         regional_archetypes[player_loc][detected] += 1
 
@@ -497,6 +523,31 @@ async def main():
             if sum(counts.values()) > 20:
                 formatted_regions[region] = dict(counts.most_common())
 
+        # Calculate Matchup Z-Scores
+        # Baseline win rate is approx 0.5 (strictly it's the specific archetype's global win rate against the field, but 0.5 is a standard baseline for "countering")
+        import math
+        processed_matchups = []
+        
+        for (my_arch, opp_arch), stats in matchup_stats.items():
+            if stats['total'] < 30: continue # Minimum sample size
+            
+            p_hat = stats['wins'] / stats['total']
+            p_0 = 0.5 # Null hypothesis: 50% win rate
+            n = stats['total']
+            
+            # Z = (p_hat - p_0) / sqrt(p_0 * (1 - p_0) / n)
+            denominator = math.sqrt((p_0 * (1 - p_0)) / n)
+            z_score = (p_hat - p_0) / denominator if denominator > 0 else 0
+            
+            processed_matchups.append({
+                "archetype": my_arch,
+                "opponent": opp_arch,
+                "win_rate": round(p_hat * 100, 1),
+                "total": n,
+                "z_score": round(z_score, 2),
+                "significant": abs(z_score) > 1.96 # 95% confidence
+            })
+
         output_data = {
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "total_players": len(top_players),
@@ -505,6 +556,7 @@ async def main():
             "top_decks": top_decks,
             "top_synergies": top_synergies,
             "archetypes": archetypes,
+            "archetype_matchups": processed_matchups,
             "player_locations": player_locations,
             "regional_archetypes": formatted_regions,
             "elixir_heatmap": heatmap_data, 

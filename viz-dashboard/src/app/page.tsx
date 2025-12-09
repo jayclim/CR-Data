@@ -3,6 +3,7 @@ import BentoGrid from "@/components/BentoGrid";
 import MetaScatterPlot from '@/components/meta/MetaScatterPlot';
 import ElixirEfficiencyChart from '@/components/meta/ElixirEfficiencyChart';
 import RegionalMetaMap from '@/components/meta/RegionalMetaMap';
+import ArchetypeMatchupHeatmap from '@/components/meta/ArchetypeMatchupHeatmap';
 import PageNavigation from '@/components/PageNavigation';
 import metaData from '@/data/meta_snapshot.json';
 
@@ -23,7 +24,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-            Going beyond simple win rates. We analyzed {metaData.total_decks} decks from the world's top players to answer three critical questions about the current state of Clash Royale.
+            Going beyond simple win rates. We analyzed {metaData.total_decks} decks from the world&apos;s top players to answer three critical questions about the current state of Clash Royale.
           </p>
           
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500 uppercase tracking-wide font-bold pt-4">
@@ -65,9 +66,9 @@ export default function Home() {
                     <span className="text-purple-500">2.</span> The Sleeper Hunt
                   </h2>
                   <p className="text-gray-400 mb-4">
-                    Everyone knows the meta cards, but where are the hidden gems? We plotted every card's 
+                    Everyone knows the meta cards, but where are the hidden gems? We plotted every card&apos;s 
                     <span className="text-white font-bold"> Win Rate</span> against its <span className="text-white font-bold">Usage Rate</span>.
-                    Cards in the top-left quadrant (High Win, Low Usage) are your "Sleeper Picks" — statistically strong but underplayed.
+                    Cards in the top-left quadrant (High Win, Low Usage) are your &quot;Sleeper Picks&quot; — statistically strong but underplayed.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-500 list-disc list-inside mb-6">
                     <li><span className="text-green-500 font-bold">Top Right:</span> Meta Staples (Safe picks)</li>
@@ -95,7 +96,7 @@ export default function Home() {
                     <span className="text-white font-bold"> Elixir Costs</span>.
                   </p>
                   <p className="text-gray-400 text-sm">
-                    In the current meta, we often see a "sweet spot" where cycle decks (low elixir) outperform heavier beatdown decks due to their ability to out-cycle counters.
+                    In the current meta, we often see a &quot;sweet spot&quot; where cycle decks (low elixir) outperform heavier beatdown decks due to their ability to out-cycle counters.
                   </p>
                 </div>
                 <div className="w-full xl:w-2/3">
@@ -117,10 +118,34 @@ export default function Home() {
                     Do players from different regions favor different strategies? We aggregated deck archetypes by the clan location of top players.
                   </p>
                   <p className="text-gray-500 text-sm italic">
-                    This data reveals cultural meta differences. For example, some regions might heavily favor "Bridge Spam" aggression, while others prefer calculated "Control" decks.
+                    This data reveals cultural meta differences. For example, some regions might heavily favor &quot;Bridge Spam&quot; aggression, while others prefer calculated &quot;Control&quot; decks.
                   </p>
                 </div>
-              </RegionalMetaMap>
+            </RegionalMetaMap>
+            </section>
+
+            <div className="w-full h-px bg-[#262626]" />
+
+            {/* Story 5: Archetype Matchups */}
+            <section id="archetype-matchups" className="space-y-6 scroll-mt-24">
+              <div className="flex flex-col xl:flex-row-reverse gap-8 items-start">
+                <div className="w-full xl:w-1/3">
+                  <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                    <span className="text-red-500">5.</span> Direct Counters
+                  </h2>
+                  <p className="text-gray-400 mb-4">
+                    Is there a true &quot;Rock Paper Scissors&quot; dynamic? We analyzed thousands of battles to find which archetypes statistically counter others.
+                  </p>
+                  <p className="text-gray-500 text-sm italic">
+                    Grid cells show the win rate of the <span className="font-bold text-white">Row Archetype</span> vs the <span className="font-bold text-white">Column Opponent</span>.
+                    <br/><br/>
+                    Significant counters (Z-score &gt; 1.96) are highlighted fully opaque.
+                  </p>
+                </div>
+                <div className="w-full xl:w-2/3">
+                  <ArchetypeMatchupHeatmap data={metaData.archetype_matchups || []} />
+                </div>
+              </div>
             </section>
           </div>
 

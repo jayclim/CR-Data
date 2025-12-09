@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { LayoutDashboard, Target, Zap, Globe } from 'lucide-react';
+import { LayoutDashboard, Target, Zap, Globe, Swords } from 'lucide-react';
 
 const sections = [
   { id: 'dashboard', label: 'The Meta Web', icon: LayoutDashboard },
   { id: 'sleeper-hunt', label: 'Sleeper Hunt', icon: Target },
   { id: 'tempo-analysis', label: 'Tempo Analysis', icon: Zap },
   { id: 'regional-playstyles', label: 'Regional Playstyles', icon: Globe },
+  { id: 'archetype-matchups', label: 'Archetype Matchups', icon: Swords },
 ];
 
 export default function PageNavigation() {
