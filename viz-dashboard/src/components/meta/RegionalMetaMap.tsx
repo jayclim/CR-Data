@@ -377,6 +377,8 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                    <YAxis hide />
                    <Tooltip 
                      contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }}
+                     itemStyle={{ color: '#fff' }}
+                     labelStyle={{ color: '#9ca3af', marginBottom: '0.25rem' }}
                      cursor={{ fill: '#333', opacity: 0.4 }}
                    />
                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>

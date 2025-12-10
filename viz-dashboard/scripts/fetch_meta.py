@@ -31,7 +31,7 @@ HEADERS = {"Authorization": f"Bearer {CR_API_KEY}"}
 
 # Configuration
 PLAYER_LIMIT = 1000  
-BATTLE_LIMIT = 100
+BATTLE_LIMIT = 200
 MAX_CONCURRENCY = 15 
 
 # Output Paths
