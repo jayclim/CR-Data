@@ -2,14 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'api-assets.clashroyale.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    unoptimized: true, // Serve images as static files - no CPU/bandwidth for optimization
   },
 };
 
