@@ -1,35 +1,1106 @@
 {
-  "timestamp": "2026-02-02 13:11:18",
-  "total_players": 0,
-  "total_decks": 0,
-  "top_cards": [],
-  "top_decks": [],
-  "top_synergies": [],
-  "archetypes": [],
-  "archetypes_generic": [],
+  "timestamp": "2026-02-03 02:36:33",
+  "total_players": 1,
+  "total_decks": 30,
+  "top_cards": [
+    {
+      "id": 26000056,
+      "name": "Skeleton Barrel",
+      "key": "skeleton-barrel",
+      "elixir": 3,
+      "type": null,
+      "rarity": "common",
+      "icon": "/cards/skeleton-barrel.png",
+      "evo_icon": "/cards/skeleton-barrel-evo.png",
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000012,
+      "name": "Skeleton Army",
+      "key": "skeleton-army",
+      "elixir": 3,
+      "type": null,
+      "rarity": "epic",
+      "icon": "/cards/skeleton-army.png",
+      "evo_icon": "/cards/skeleton-army-evo.png",
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000002,
+      "name": "Goblins",
+      "key": "goblins",
+      "elixir": 2,
+      "type": null,
+      "rarity": "common",
+      "icon": "/cards/goblins.png",
+      "evo_icon": null,
+      "hero_icon": "/cards/goblins-hero.png",
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000069,
+      "name": "Skeleton King",
+      "key": "skeleton-king",
+      "elixir": 4,
+      "type": null,
+      "rarity": "champion",
+      "icon": "/cards/skeleton-king.png",
+      "evo_icon": null,
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000083,
+      "name": "Mother Witch",
+      "key": "mother-witch",
+      "elixir": 4,
+      "type": null,
+      "rarity": "legendary",
+      "icon": "/cards/mother-witch.png",
+      "evo_icon": null,
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000097,
+      "name": "Suspicious Bush",
+      "key": "suspicious-bush",
+      "elixir": 2,
+      "type": null,
+      "rarity": "rare",
+      "icon": "/cards/suspicious-bush.png",
+      "evo_icon": null,
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 26000040,
+      "name": "Dart Goblin",
+      "key": "dart-goblin",
+      "elixir": 3,
+      "type": null,
+      "rarity": "rare",
+      "icon": "/cards/dart-goblin.png",
+      "evo_icon": "/cards/dart-goblin-evo.png",
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    },
+    {
+      "id": 28000026,
+      "name": "Vines",
+      "key": "vines",
+      "elixir": 3,
+      "type": null,
+      "rarity": "epic",
+      "icon": "/cards/vines.png",
+      "evo_icon": null,
+      "hero_icon": null,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 45
+    }
+  ],
+  "top_decks": [
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins-hero.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png",
+          "is_hero": true
+        },
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army-evo.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null,
+          "is_evo": true
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel-evo.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null,
+          "is_evo": true
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "avg_elixir": 3.0,
+      "count": 30,
+      "usage_rate": 100.0,
+      "win_rate": 60
+    }
+  ],
+  "top_synergies": [
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "key": "dart-goblin",
+          "elixir": 3,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/dart-goblin.png",
+          "evo_icon": "/cards/dart-goblin-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000002,
+          "name": "Goblins",
+          "key": "goblins",
+          "elixir": 2,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/goblins.png",
+          "evo_icon": null,
+          "hero_icon": "/cards/goblins-hero.png"
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "key": "mother-witch",
+          "elixir": 4,
+          "type": null,
+          "rarity": "legendary",
+          "icon": "/cards/mother-witch.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "key": "skeleton-army",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/skeleton-army.png",
+          "evo_icon": "/cards/skeleton-army-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "key": "skeleton-barrel",
+          "elixir": 3,
+          "type": null,
+          "rarity": "common",
+          "icon": "/cards/skeleton-barrel.png",
+          "evo_icon": "/cards/skeleton-barrel-evo.png",
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000069,
+          "name": "Skeleton King",
+          "key": "skeleton-king",
+          "elixir": 4,
+          "type": null,
+          "rarity": "champion",
+          "icon": "/cards/skeleton-king.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    },
+    {
+      "cards": [
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "key": "suspicious-bush",
+          "elixir": 2,
+          "type": null,
+          "rarity": "rare",
+          "icon": "/cards/suspicious-bush.png",
+          "evo_icon": null,
+          "hero_icon": null
+        },
+        {
+          "id": 28000026,
+          "name": "Vines",
+          "key": "vines",
+          "elixir": 3,
+          "type": null,
+          "rarity": "epic",
+          "icon": "/cards/vines.png",
+          "evo_icon": null,
+          "hero_icon": null
+        }
+      ],
+      "count": 60,
+      "synergy_rate": 200.0
+    }
+  ],
+  "archetypes": [
+    {
+      "name": "Skeleton Barrel (Generic)",
+      "count": 30,
+      "share": 100.0
+    }
+  ],
+  "archetypes_generic": [
+    {
+      "name": "Control",
+      "count": 30,
+      "share": 100.0
+    }
+  ],
   "archetype_matchups_specific": [],
   "archetype_matchups_generic": [],
-  "player_locations": [],
-  "regional_archetypes_specific": {},
-  "regional_archetypes_generic": {},
-  "elixir_heatmap": [],
-  "deck_elixir_stats": [],
+  "player_locations": [
+    {
+      "id": "DE",
+      "value": 2
+    }
+  ],
+  "regional_archetypes_specific": {
+    "DE": {
+      "Skeleton Barrel (Generic)": 30
+    }
+  },
+  "regional_archetypes_generic": {
+    "DE": {
+      "Control": 30
+    }
+  },
+  "elixir_heatmap": [
+    {
+      "type": "Troop",
+      "elixir": 3,
+      "value": 45.0,
+      "cards": [
+        "Skeleton Barrel",
+        "Skeleton Army",
+        "Dart Goblin"
+      ]
+    },
+    {
+      "type": "Troop",
+      "elixir": 2,
+      "value": 45.0,
+      "cards": [
+        "Goblins",
+        "Suspicious Bush"
+      ]
+    },
+    {
+      "type": "Troop",
+      "elixir": 4,
+      "value": 45.0,
+      "cards": [
+        "Skeleton King",
+        "Mother Witch"
+      ]
+    }
+  ],
+  "deck_elixir_stats": [
+    {
+      "elixir": 3.0,
+      "win_rate": 80.0,
+      "count": 30
+    }
+  ],
   "global_averages": {
-    "wins": 0,
-    "threeCrownWins": 0,
-    "bestTrophies": 0,
-    "warDayWins": 0,
-    "challengeCardsWon": 0
+    "wins": 77313,
+    "threeCrownWins": 11223,
+    "bestTrophies": 10236,
+    "warDayWins": 2,
+    "challengeCardsWon": 1477260
   },
   "global_q3": {
-    "wins": 0,
-    "threeCrownWins": 0,
-    "bestTrophies": 0,
-    "warDayWins": 0,
-    "challengeCardsWon": 0
+    "wins": 77313,
+    "threeCrownWins": 11223,
+    "bestTrophies": 10236,
+    "warDayWins": 2,
+    "challengeCardsWon": 1477260
   },
   "leaderboards": {
-    "players": [],
+    "players": [
+      {
+        "tag": "#R09228V",
+        "name": "SK Morten",
+        "expLevel": 86,
+        "eloRating": 1840,
+        "rank": 1,
+        "clan": {
+          "tag": "#G2PQYU8J",
+          "name": "sahnenmann",
+          "badgeId": 16000139
+        }
+      }
+    ],
     "clans": [
       {
         "tag": "#QLCPU0JU",
@@ -41,7 +1112,7 @@
           "name": "Europe",
           "isCountry": false
         },
-        "clanScore": 117859,
+        "clanScore": 118121,
         "members": 50,
         "badgeId": 16000177
       },
@@ -55,13 +1126,13 @@
           "name": "Europe",
           "isCountry": false
         },
-        "clanScore": 117487,
+        "clanScore": 118062,
         "members": 50,
         "badgeId": 16000022
       },
       {
-        "tag": "#2LJG2QY",
-        "name": "CLAN OF CLASHES",
+        "tag": "#G9LVUL0L",
+        "name": "Solyn",
         "rank": 3,
         "previousRank": -1,
         "location": {
@@ -69,13 +1140,13 @@
           "name": "Europe",
           "isCountry": false
         },
-        "clanScore": 117449,
-        "members": 48,
-        "badgeId": 16000146
+        "clanScore": 117243,
+        "members": 49,
+        "badgeId": 16000128
       },
       {
-        "tag": "#G9LVUL0L",
-        "name": "Solyn",
+        "tag": "#2LJG2QY",
+        "name": "CLAN OF CLASHES",
         "rank": 4,
         "previousRank": -1,
         "location": {
@@ -83,9 +1154,9 @@
           "name": "Europe",
           "isCountry": false
         },
-        "clanScore": 117129,
-        "members": 49,
-        "badgeId": 16000128
+        "clanScore": 117193,
+        "members": 48,
+        "badgeId": 16000146
       },
       {
         "tag": "#GCUVPRLR",
@@ -97,7 +1168,7 @@
           "name": "Europe",
           "isCountry": false
         },
-        "clanScore": 117034,
+        "clanScore": 117092,
         "members": 50,
         "badgeId": 16000002
       }
