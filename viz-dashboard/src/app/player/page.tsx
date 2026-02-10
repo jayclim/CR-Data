@@ -1,65 +1,52 @@
-'use client';
-
-import React, { useState } from 'react';
-import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
+import { Search, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function PlayerSearchPage() {
-  const [tag, setTag] = useState('');
-  const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!tag) return;
-    
-    // Clean tag
-    const cleanTag = tag.replace('#', '').toUpperCase();
-    router.push(`/player/${cleanTag}`);
-  };
-
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8 flex flex-col items-center justify-center">
       <div className="max-w-md w-full space-y-8 -mt-20">
         {/* Header */}
         <div className="text-center space-y-4 flex flex-col items-center">
-          <img 
-            src="/assets/crown.png" 
-            alt="Crown" 
-            className="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]"
+          <img
+            src="/assets/crown.png"
+            alt="Crown"
+            className="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(234,179,8,0.5)] opacity-50"
           />
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
             Player Analytics
           </h1>
-          <p className="text-gray-400 text-lg">
-            Deep dive into your Clash Royale stats.
-            <br />
-            <span className="text-sm text-gray-500">Battle Log • Chest Cycle • Skill Radar</span>
+        </div>
+
+        {/* Disabled Notice */}
+        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-xl p-6 text-center space-y-3">
+          <AlertTriangle className="w-10 h-10 text-yellow-500 mx-auto" />
+          <h2 className="text-lg font-semibold text-yellow-400">Feature Temporarily Disabled</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Player search has been disabled to stay within the Vercel free tier limits.
+            Each lookup requires a live API call to the Clash Royale servers, which quickly
+            exceeds the serverless function invocation quota.
           </p>
         </div>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative w-full">
+        {/* Disabled Search Bar */}
+        <div className="relative w-full opacity-50 pointer-events-none">
           <input
             type="text"
-            value={tag}
-            onChange={(e) => setTag(e.target.value)}
             placeholder="Enter Player Tag"
-            className="w-full bg-[#171717] border border-[#262626] rounded-full py-4 px-12 text-white text-lg focus:outline-none focus:border-purple-500 transition-colors shadow-lg"
-            autoFocus
+            disabled
+            className="w-full bg-[#171717] border border-[#262626] rounded-full py-4 px-12 text-white text-lg cursor-not-allowed"
           />
           <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-500 w-6 h-6" />
-          <button 
-            type="submit"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-full text-sm font-bold transition-colors shadow-md"
-          >
+          <span className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-700 text-gray-400 px-6 py-2 rounded-full text-sm font-bold cursor-not-allowed">
             Analyze
-          </button>
-        </form>
+          </span>
+        </div>
 
         <div className="text-center">
-           <p className="text-xs text-gray-600">
-             Try searching for <span className="text-gray-400 font-mono cursor-pointer hover:text-white transition-colors" onClick={() => setTag('#2J8J2PLLP')}>#2J8J2PLLP</span>
-           </p>
+          <Link href="/" className="text-sm text-purple-400 hover:text-purple-300 transition-colors">
+            ← Back to Dashboard
+          </Link>
         </div>
       </div>
     </main>
