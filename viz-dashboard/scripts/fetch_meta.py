@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import asyncio
 import aiohttp
@@ -708,12 +709,23 @@ async def main():
             }
         }
         
+        # Guard: a failed/empty fetch (e.g. API outage or rate limit) yields zero
+        # players/decks. Writing that out would blank the live dashboard, so skip
+        # the write and leave the previous good snapshot in place. Exit non-zero so
+        # the failure is visible in the Actions log.
+        if len(top_players) == 0 or total_decks == 0:
+            logger.error(
+                "Empty result (players=%d, decks=%d) — keeping existing snapshot, not overwriting.",
+                len(top_players), total_decks
+            )
+            sys.exit(1)
+
         os.makedirs(DATA_DIR, exist_ok=True)
         output_file = os.path.join(DATA_DIR, "meta_snapshot.json")
-        
+
         with open(output_file, 'w') as f:
             json.dump(output_data, f, indent=2)
-            
+
         logger.info(f"Data saved to {output_file}")
 
 if __name__ == "__main__":

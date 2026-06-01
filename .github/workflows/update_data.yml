@@ -40,10 +40,10 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Add the data file and any new card images
+          # Add the data file. Card icons are served from the RoyaleAPI CDN, so
+          # there are no longer any local card images to commit.
           git add viz-dashboard/src/data/meta_snapshot.json
-          git add viz-dashboard/public/cards/
-          
+
           # Commit if there are changes
           git commit -m "chore: update meta data [skip ci]" || echo "No changes to commit"
           
