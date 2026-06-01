@@ -2,10 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const CR_API_BASE = "https://proxy.royaleapi.dev/v1";
 
+// Live proxy lookups are disabled by default to protect the Vercel function /
+// edge-compute quota — each call is an upstream API request + function invocation.
+// Re-enable by setting SEARCH_API_ENABLED=true in the Vercel project env.
+const SEARCH_API_ENABLED = process.env.SEARCH_API_ENABLED === "true";
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ path: string[] }> }
 ) {
+    if (!SEARCH_API_ENABLED) {
+        return NextResponse.json(
+            { error: "This endpoint is currently disabled." },
+            { status: 503 }
+        );
+    }
+
     const { path: pathArray } = await params;
     // Encode each segment to ensure special characters like # are preserved as %23
     const path = pathArray.map(segment => encodeURIComponent(segment)).join('/');

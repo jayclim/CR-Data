@@ -2,10 +2,22 @@ import { NextResponse } from 'next/server';
 
 const CR_API_BASE = "https://proxy.royaleapi.dev/v1";
 
+// Live clan lookups are disabled by default to protect the Vercel function /
+// edge-compute quota — each call is an upstream API request + function invocation.
+// Re-enable by setting SEARCH_API_ENABLED=true in the Vercel project env.
+const SEARCH_API_ENABLED = process.env.SEARCH_API_ENABLED === "true";
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ tag: string }> }
 ) {
+    if (!SEARCH_API_ENABLED) {
+        return NextResponse.json(
+            { error: "Clan search is currently disabled." },
+            { status: 503 }
+        );
+    }
+
     const { tag } = await params;
 
     if (!tag) {
