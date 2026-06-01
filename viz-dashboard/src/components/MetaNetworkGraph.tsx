@@ -281,7 +281,7 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
   }, [data, dimensions]);
 
   return (
-    <div className="bg-[#171717] border border-[#262626] rounded-lg overflow-hidden h-[600px] flex flex-col">
+    <div className="bg-[#171717] border border-[#262626] rounded-lg overflow-hidden h-full min-h-[400px] flex flex-col">
       <div className="px-3 py-2 border-b border-[#262626] bg-[#1a1a1a] flex justify-between items-center">
         <h2 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
           <span className="text-blue-500">🕸️</span> Meta Web (D3.js)

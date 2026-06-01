@@ -52,22 +52,22 @@ export default function BentoGrid({ synergies, playerLocations, stats }: BentoGr
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[800px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[800px]">
         {/* Large Cell: Meta Network Graph (Takes up 2/3 width) */}
-        <div className="lg:col-span-2 h-full relative group">
+        <div className="lg:col-span-2 h-[500px] lg:h-full relative group">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
           <MetaNetworkGraph synergies={synergies} />
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-4 h-full">
+        <div className="flex flex-col gap-4 lg:h-full">
           {/* Map Cell (Takes up top half of right column) */}
-          <div className="flex-1 min-h-0">
+          <div className="h-[360px] lg:h-auto lg:flex-1 min-h-0">
             <PlayerMap locations={playerLocations} />
           </div>
 
           {/* Placeholder / Future Viz Cell */}
-          <div className="flex-1 min-h-0 bg-[#171717] border border-[#262626] rounded-xl p-4 flex flex-col justify-center items-center text-center relative overflow-hidden group">
+          <div className="h-[180px] lg:h-auto lg:flex-1 min-h-0 bg-[#171717] border border-[#262626] rounded-xl p-4 flex flex-col justify-center items-center text-center relative overflow-hidden group">
             <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
             <div className="z-10">
               <h3 className="text-lg font-bold text-white mb-2">Coming Soon</h3>
