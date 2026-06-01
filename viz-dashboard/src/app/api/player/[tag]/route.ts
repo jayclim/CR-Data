@@ -55,6 +55,12 @@ export async function GET(
             ...profile,
             battleLog: battleLog,
             upcomingChests: chests.items || [],
+        }, {
+            // Cache successful responses at the CDN so repeated lookups of the same
+            // tag serve from cache instead of re-running the function.
+            headers: {
+                "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+            },
         });
 
     } catch (error) {

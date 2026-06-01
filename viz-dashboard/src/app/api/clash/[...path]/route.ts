@@ -38,7 +38,13 @@ export async function GET(
             return NextResponse.json(data, { status: response.status });
         }
 
-        return NextResponse.json(data);
+        return NextResponse.json(data, {
+            // Cache successful responses at the CDN so repeated identical requests
+            // serve from cache instead of re-running the function.
+            headers: {
+                "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+            },
+        });
     } catch (error) {
         console.error("Proxy error:", error);
         return NextResponse.json(

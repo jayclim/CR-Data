@@ -9,20 +9,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configuration
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CARDS_DIR = os.path.join(BASE_DIR, "public", "cards")
+# Card icons are served directly from the RoyaleAPI CDN instead of being
+# downloaded into /public and served by Vercel. Hot-linking the CDN keeps these
+# images off our edge entirely (they don't count toward Vercel Edge Requests).
+# URL scheme: https://cdn.royaleapi.com/static/img/cards-150/<slug>.png
+#   - base icon: <slug>.png
+#   - evolution: <slug>-ev1.png   (the API key uses "-evo", the CDN uses "-ev1")
+#   - hero:      <slug>-hero.png
+CDN_BASE = "https://cdn.royaleapi.com/static/img/cards-150"
 
-def download_image(url, filename):
-    try:
-        if os.path.exists(filename):
-            return 
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-    except Exception as e:
-        logger.error(f"Failed to download image {url}: {e}")
+def cdn_url(slug):
+    return f"{CDN_BASE}/{slug}.png"
 
 def fetch_and_process_cards(session, api_base, headers):
     logger.info("Fetching all cards...")
@@ -40,31 +37,14 @@ def fetch_and_process_cards(session, api_base, headers):
         return {}
     
     card_map = {}
-    os.makedirs(CARDS_DIR, exist_ok=True)
-    
+
     for card in data.get("items", []):
         name = card["name"]
         key = name.lower().replace(" ", "-").replace(".", "")
-        
-        # 1. Download Normal Icon
-        icon_url = card.get("iconUrls", {}).get("medium")
-        if icon_url:
-            local_path = os.path.join(CARDS_DIR, f"{key}.png")
-            download_image(icon_url, local_path)
-            
-        # 2. Download Evo Icon (if available)
-        # API usually provides 'evolutionMedium' in iconUrls for evos
-        evo_icon_url = card.get("iconUrls", {}).get("evolutionMedium")
-        if evo_icon_url:
-            local_path_evo = os.path.join(CARDS_DIR, f"{key}-evo.png")
-            download_image(evo_icon_url, local_path_evo)
-            
-        # 3. Download Hero Icon (if available)
-        # Assuming API provides 'heroMedium' or similar for heroes
-        hero_icon_url = card.get("iconUrls", {}).get("heroMedium")
-        if hero_icon_url:
-            local_path_hero = os.path.join(CARDS_DIR, f"{key}-hero.png")
-            download_image(hero_icon_url, local_path_hero)
+
+        # Whether the API exposes evolution / hero variants for this card.
+        has_evo = bool(card.get("iconUrls", {}).get("evolutionMedium"))
+        has_hero = bool(card.get("iconUrls", {}).get("heroMedium"))
 
         card_map[name] = {
             "id": card["id"],
@@ -73,9 +53,9 @@ def fetch_and_process_cards(session, api_base, headers):
             "elixir": card.get("elixirCost", 0),
             "type": card.get("type"),
             "rarity": card.get("rarity"),
-            "icon": f"/cards/{key}.png",
-            "evo_icon": f"/cards/{key}-evo.png" if evo_icon_url else None,
-            "hero_icon": f"/cards/{key}-hero.png" if hero_icon_url else None
+            "icon": cdn_url(key),
+            "evo_icon": cdn_url(f"{key}-ev1") if has_evo else None,
+            "hero_icon": cdn_url(f"{key}-hero") if has_hero else None
         }
         
     logger.info(f"Processed {len(card_map)} cards and assets.")

@@ -48,7 +48,13 @@ export async function GET(
         }
 
         const data = await response.json();
-        return NextResponse.json(data);
+        return NextResponse.json(data, {
+            // Cache successful responses at the CDN so repeated lookups of the same
+            // clan serve from cache instead of re-running the function.
+            headers: {
+                "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+            },
+        });
 
     } catch (error) {
         console.error("Failed to fetch clan data:", error);
