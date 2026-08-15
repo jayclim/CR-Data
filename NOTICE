@@ -1,0 +1,32 @@
+Third-party code in this repository
+===================================
+
+mcp-server/
+-----------
+
+Derived from Chat-Royale by Baighasan:
+https://github.com/Baighasan/Chat-Royale
+
+Several modules under `mcp-server/src/tools/` are copied from that project's
+`src/mcp/src/tools/` with little or no modification. `analytics.py` is original
+work added here.
+
+Chat-Royale publishes no license file. Under default copyright that means no
+rights to copy, modify, or redistribute it have been granted, so the MIT license
+in this repository explicitly excludes `mcp-server/`, and no grant is offered or
+implied for it.
+
+This directory is not used by the dashboard or by the data pipeline. The only
+reference to it from other code is the path `mcp-server/.env`, read for a
+Clash Royale API key.
+
+
+Clash Royale data and assets
+----------------------------
+
+Card data, images, and battle records are retrieved from the Supercell API and
+remain Supercell's property, used under the Supercell Fan Content Policy:
+https://supercell.com/en/fan-content-policy/
+
+This project is not affiliated with, endorsed, sponsored, or specifically
+approved by Supercell, and Supercell is not responsible for it.

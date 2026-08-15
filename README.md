@@ -1,13 +1,13 @@
 # Clash Royale Data Visualization Showcase
 
 This project consists of two parts:
-1. **MCP Server** (`mcp-server/`): A Python server that connects to the Clash Royale API. Based on the work by [Baighasan/Chat-Royale](https://github.com/Baighasan/Chat-Royale).
-2. **Visualization Dashboard** (`viz-dashboard/`): A Next.js web application to display the data.
+1. **Visualization Dashboard** (`viz-dashboard/`): A Next.js web application to display the data, plus the ETL scripts that snapshot it.
+2. **MCP Server** (`mcp-server/`): A Python server exposing the Clash Royale API to MCP clients. Largely copied from [Baighasan/Chat-Royale](https://github.com/Baighasan/Chat-Royale), and **not used by the dashboard or the data pipeline** — see [NOTICE](NOTICE).
 
 ## Prerequisites
 - **Python 3.10+**
 - **Node.js 18+**
-- **Clash Royale API Key** (You have already set this up in `mcp-server/.env`)
+- **Clash Royale API Key**, set as `CR_PROXY_API_KEY` in `mcp-server/.env` (or in a `.env` at the repo root)
 
 ---
 
@@ -79,3 +79,14 @@ To fetch fresh data (e.g., daily), use the provided update script:
 4. Triggers a redeploy on Vercel (if connected).
 
 *Note: You need a valid `CR_API_KEY` in `mcp-server/.env` for this to work.*
+
+---
+
+## License
+
+The dashboard, the ETL scripts, and the update tooling are MIT licensed — see
+[LICENSE](LICENSE). `mcp-server/` is excluded from that grant because it is derived from
+an upstream project that publishes no license; see [NOTICE](NOTICE) for details.
+
+Clash Royale data and assets remain Supercell's property, used under the Supercell Fan
+Content Policy. This project is not affiliated with or endorsed by Supercell.
