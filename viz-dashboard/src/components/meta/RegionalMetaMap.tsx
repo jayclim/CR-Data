@@ -340,8 +340,8 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
       {/* Bottom Row: Chart & Insights */}
       <div className="flex flex-col lg:flex-row gap-8 lg:h-[300px]">
          {/* Left: Bar Chart */}
-         <div className="w-full lg:w-2/3 flex flex-col min-h-[300px]">
-           <div className="flex-1">
+         <div className="w-full lg:w-2/3 h-[300px]">
+           <div className="h-full">
              {chartData.length > 0 ? (
                <ResponsiveContainer width="100%" height="100%">
                  <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
