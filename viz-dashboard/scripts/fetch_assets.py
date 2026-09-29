@@ -9,13 +9,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Card icons are served directly from the RoyaleAPI CDN instead of being
-# downloaded into /public and served by Vercel. Hot-linking the CDN keeps these
-# images off our edge entirely (they don't count toward Vercel Edge Requests).
-# URL scheme: https://cdn.royaleapi.com/static/img/cards-150/<slug>.png
-#   - base icon: <slug>.png
-#   - evolution: <slug>-ev1.png   (the API key uses "-evo", the CDN uses "-ev1")
-#   - hero:      <slug>-hero.png
+# Use game API artwork for current cards and variants. Images are requested
+# directly from the asset host, avoiding Vercel image/edge request usage.
+# RoyaleAPI slug URLs are a fallback only when the API omits a base icon.
 CDN_BASE = "https://cdn.royaleapi.com/static/img/cards-150"
 
 def cdn_url(slug):
@@ -26,7 +22,7 @@ def fetch_and_process_cards(session, api_base, headers):
     url = f"{api_base}/cards"
     
     try:
-        response = session.get(url, headers=headers)
+        response = session.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
     except Exception as e:
@@ -53,9 +49,9 @@ def fetch_and_process_cards(session, api_base, headers):
             "elixir": card.get("elixirCost", 0),
             "type": card.get("type"),
             "rarity": card.get("rarity"),
-            "icon": cdn_url(key),
-            "evo_icon": cdn_url(f"{key}-ev1") if has_evo else None,
-            "hero_icon": cdn_url(f"{key}-hero") if has_hero else None
+            "icon": card.get("iconUrls", {}).get("medium") or cdn_url(key),
+            "evo_icon": card["iconUrls"]["evolutionMedium"] if has_evo else None,
+            "hero_icon": card["iconUrls"]["heroMedium"] if has_hero else None
         }
         
     logger.info(f"Processed {len(card_map)} cards and assets.")

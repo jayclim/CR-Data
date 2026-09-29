@@ -6,6 +6,7 @@ import aiohttp
 import time
 import logging
 import random
+from datetime import datetime, timezone
 from collections import Counter
 from dotenv import load_dotenv
 
@@ -24,8 +25,7 @@ if not os.path.exists(env_path):
 load_dotenv(env_path)
 
 CR_API_KEY = os.getenv("CR_PROXY_API_KEY")
-if not CR_API_KEY:
-    raise ValueError("CR_PROXY_API_KEY not found in environment variables")
+
 
 CR_API_BASE = "https://proxy.royaleapi.dev/v1"
 HEADERS = {"Authorization": f"Bearer {CR_API_KEY}"}
@@ -41,7 +41,7 @@ DATA_DIR = os.path.join(BASE_DIR, "src", "data")
 CARDS_DIR = os.path.join(BASE_DIR, "public", "cards")
 
 # Card Role Definitions
-HEAVY_TANKS = {"Golem", "Lava Hound", "Electro Giant", "Goblin Giant", "Elixir Golem", "Giant", "Royal Giant"}
+HEAVY_TANKS = {"Minion Giant", "Golem", "Lava Hound", "Electro Giant", "Goblin Giant", "Elixir Golem", "Giant", "Royal Giant"}
 SIEGE_BUILDINGS = {"X-Bow", "Mortar"}
 WIN_CONDITIONS = HEAVY_TANKS | SIEGE_BUILDINGS | {
     "Hog Rider", "Ram Rider", "Battle Ram", "Balloon", "Graveyard", "Miner", 
@@ -60,18 +60,19 @@ import requests
 
 async def make_request(endpoint, session, params=None):
     url = f"{CR_API_BASE}/{endpoint}"
-    try:
-        async with session.get(url, headers=HEADERS, params=params) as response:
-            if response.status == 429:
-                sleep_time = 2 + random.uniform(0, 1)
-                logger.warning(f"Rate limited. Sleeping for {sleep_time:.2f} seconds...")
-                await asyncio.sleep(sleep_time)
-                return await make_request(endpoint, session, params)
-            response.raise_for_status()
-            return await response.json()
-    except Exception as e:
-        logger.error(f"Request failed for {endpoint}: {e}")
-        return None
+    for attempt in range(3):
+        try:
+            async with session.get(url, headers=HEADERS, params=params) as response:
+                if response.status == 429 or response.status >= 500:
+                    if attempt < 2:
+                        await asyncio.sleep(2 ** attempt + random.uniform(0, 1))
+                        continue
+                response.raise_for_status()
+                return await response.json()
+        except (aiohttp.ClientError, asyncio.TimeoutError) as error:
+            logger.error("Request failed for %s: %s", endpoint, error)
+            return None
+    return None
 
 
 def determine_archetype(deck_cards):
@@ -94,13 +95,14 @@ def determine_archetype(deck_cards):
     primary_win_cons = [name for name in card_names if name in WIN_CONDITIONS]
     # Sort win cons by "heaviness" (approximate priority)
     # This is a simple heuristic; heavier usually defines the deck more
-    primary_win_cons.sort(key=lambda x: 10 if x in HEAVY_TANKS else (5 if x in SIEGE_BUILDINGS else 1), reverse=True)
+    primary_win_cons.sort(key=lambda x: (10 if x in HEAVY_TANKS else (5 if x in SIEGE_BUILDINGS else 1), x), reverse=True)
     primary_win_con = primary_win_cons[0] if primary_win_cons else None
 
     # Step 1: Beatdown (The Heavyweights)
     if has_heavy_tank:
         # Special check for Giant Graveyard -> Control/Beatdown Hybrid? Usually classed as Beatdown or Control.
         # User prompt says Giant GY -> Beatdown.
+        if "Minion Giant" in card_names: return ("Minion Giant", "Beatdown")
         if "Lava Hound" in card_names: return ("Lava Hound", "Beatdown")
         if "Golem" in card_names: return ("Golem", "Beatdown")
         if "Electro Giant" in card_names: return ("Electro Giant", "Beatdown")
@@ -184,10 +186,15 @@ async def fetch_player_battles(player_tag, session):
     valid_battles = []
     for battle in data:
         if battle.get("type") in ["PvP", "pathOfLegend"]:
-            if battle.get("team") and len(battle["team"]) > 0:
+            if len(battle.get("team", [])) == 1 and len(battle.get("opponent", [])) == 1:
                 # Determine win/loss
                 team = battle["team"][0]
                 opponent = battle["opponent"][0]
+                if len(team.get("cards", [])) != 8 or len(opponent.get("cards", [])) != 8:
+                    continue
+                # Only decisive 1v1 games contribute to win rates.
+                if team.get("crowns", 0) == opponent.get("crowns", 0):
+                    continue
                 win = 0
                 if team.get("crowns", 0) > opponent.get("crowns", 0):
                     win = 1
@@ -218,11 +225,14 @@ async def fetch_profile(tag, session):
 async def main():
     logger.info("Starting Meta Snapshot Data Pipeline... (Async Mode)")
     
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
         # 1. Fetch Cards
         loop = asyncio.get_running_loop()
         card_map = await loop.run_in_executor(None, fetch_cards_sync_wrapper, CR_API_BASE, HEADERS)
         
+        if not card_map:
+            raise RuntimeError("Card catalog unavailable; keeping existing snapshot")
+
         # 2. Fetch Top Players
         logger.info(f"Fetching Top {PLAYER_LIMIT} Players...")
         top_players = []
@@ -256,6 +266,8 @@ async def main():
         logger.info("Fetching battles and clan locations in parallel...")
         
         card_counts = Counter()
+        card_wins = Counter()
+        deck_wins = Counter()
         synergy_counts = Counter()
         archetype_counts_specific = Counter()
         archetype_counts_generic = Counter()
@@ -308,8 +320,6 @@ async def main():
 
                 if player_loc and player_loc != "Unknown":
                     location_counts[player_loc] += 1
-                if player_loc and player_loc != "Unknown":
-                    location_counts[player_loc] += 1
                     if player_loc not in regional_archetypes_specific:
                         regional_archetypes_specific[player_loc] = Counter()
                     if player_loc not in regional_archetypes_generic:
@@ -324,6 +334,8 @@ async def main():
                     
                     card_names = [c["name"] for c in deck]
                     card_counts.update(card_names)
+                    if is_win:
+                        card_wins.update(card_names)
                     
                     # Calculate Avg Elixir
                     deck_cost = sum([c.get("elixirCost", 0) for c in deck])
@@ -338,6 +350,7 @@ async def main():
                     if len(card_names) == 8:
                         deck_tuple = tuple(sorted(card_names))
                         deck_counts[deck_tuple] += 1
+                        deck_wins[deck_tuple] += is_win
                         
                         # Identify Evos and Heroes
                         evos = []
@@ -392,7 +405,6 @@ async def main():
                     for i in range(len(sorted_cards)):
                         for j in range(i + 1, len(sorted_cards)):
                             pair = f"{sorted_cards[i]} + {sorted_cards[j]}"
-                            synergy_counts[pair] += 1
                             synergy_counts[pair] += 1
                     
                     detected_specific, detected_generic = determine_archetype(deck)
@@ -497,7 +509,7 @@ async def main():
                 "avg_elixir": round(avg_elixir / 8, 1),
                 "count": count,
                 "usage_rate": round((count / total_decks) * 100, 2),
-                "win_rate": round(50 + (count % 20), 1)
+                "win_rate": round(deck_wins[deck_tuple] / count * 100, 1)
             })
 
         top_cards = []
@@ -507,7 +519,7 @@ async def main():
                 **card_info,
                 "count": count,
                 "usage_rate": round((count / total_decks) * 100, 2),
-                "win_rate": round(45 + (count % 15), 2)
+                "win_rate": round(card_wins[name] / count * 100, 2)
             })
 
         top_synergies = []
@@ -683,16 +695,14 @@ async def main():
         processed_matchups_generic = process_matchups(matchup_stats_generic)
 
         output_data = {
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "methodology": "Decisive 1v1 PvP and Ranked deck observations from sampled top players. Repeated battles across players can appear twice. Card and deck win rates use observed outcomes; variants are pooled. Clan location is a regional proxy, not player residence.",
             "total_players": len(top_players),
             "total_decks": total_decks,
             "top_cards": top_cards,
             "top_decks": top_decks,
             "top_synergies": top_synergies,
-            "top_synergies": top_synergies,
             "archetypes": archetypes_specific, # Keep "archetypes" key for backward compatibility
-            "archetypes_generic": archetypes_generic,
-            "archetype_matchups_specific": processed_matchups_specific,
             "archetypes_generic": archetypes_generic,
             "archetype_matchups_specific": processed_matchups_specific,
             "archetype_matchups_generic": processed_matchups_generic,
@@ -723,10 +733,14 @@ async def main():
         os.makedirs(DATA_DIR, exist_ok=True)
         output_file = os.path.join(DATA_DIR, "meta_snapshot.json")
 
-        with open(output_file, 'w') as f:
+        temporary_file = output_file + '.tmp'
+        with open(temporary_file, 'w') as f:
             json.dump(output_data, f, indent=2)
+        os.replace(temporary_file, output_file)
 
         logger.info(f"Data saved to {output_file}")
 
 if __name__ == "__main__":
+    if not CR_API_KEY:
+        raise ValueError("CR_PROXY_API_KEY not found in environment variables")
     asyncio.run(main())

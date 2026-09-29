@@ -1,41 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card-bg: #171717;
-  --card-border: #262626;
-  --primary: #3b82f6;
-  --secondary: #a855f7;
-  --accent: #f59e0b;
+  --background: #f4f7fa;
+  --foreground: #142a40;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --primary: #2563eb;
+  --secondary: #087f72;
+  --accent: #ad6500;
+  color-scheme: light;
 }
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--card-border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #404040;
-}
+body { margin: 0; color: var(--foreground); background: var(--background); font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+::selection { background: #dbeafe; color: #142a40; }
+html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+.page-shell { max-width: 1280px; margin: auto; padding: 44px 32px 72px; }
+.page-heading { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.1; font-weight: 650; letter-spacing: -.045em; }
+.section-heading { font-size: 1.45rem; font-weight: 600; letter-spacing: -.025em; }
+.panel { background: white; border: 1px solid var(--card-border); border-radius: 12px; }
+.section-copy { color: #526579; font-size: 15px; line-height: 1.75; max-width: 68ch; }
+.data-note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); padding: 14px 0; margin-top: 28px; color: #526579; font-size: 13px; font-variant-numeric: tabular-nums; }
+.recharts-wrapper { font-family: inherit; }
+.recharts-tooltip-wrapper { z-index: 20; }
+@media (max-width: 640px) { .page-shell { padding: 28px 16px 48px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
 
 // Cloudflare Web Analytics beacon token. Cookieless + privacy-friendly, so no
 // consent banner is required. Set NEXT_PUBLIC_CF_BEACON_TOKEN in the Vercel
@@ -11,8 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
 
 export const metadata: Metadata = {
-  title: "Clash Royale Viz",
-  description: "Data visualization showcase for Clash Royale",
+  title: "Royale Index | Clash Royale analysis",
+  description: "Explore Clash Royale card usage, deck outcomes, and regional playstyles from a dated sample of top players.",
 };
 
 import Navbar from "@/components/Navbar";
@@ -24,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body >
         <Navbar />
         {children}
         {cfBeaconToken && (

@@ -25,7 +25,7 @@ interface RegionalData {
 interface RegionalMetaMapProps {
   specificData: RegionalData;
   genericData: RegionalData;
-  children?: React.ReactNode; 
+  children?: React.ReactNode;
 }
 
 const ARCHETYPE_COLORS: { [key: string]: string } = {
@@ -33,9 +33,9 @@ const ARCHETYPE_COLORS: { [key: string]: string } = {
   "Control": "#3b82f6",  // Blue
   "Cycle": "#22c55e",    // Green
   "Siege": "#eab308",    // Yellow
-  "Bridge Spam": "#a855f7", // Purple
+  "Bridge Spam": "#087f72", // Purple
   "Air": "#06b6d4",      // Cyan
-  "Spell Bait": "#ec4899", // Pink
+  "Spell Bait": "#ad6500", // Pink
   "Unknown": "#6b7280"   // Gray
 };
 
@@ -104,7 +104,7 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
     let sorted = Object.entries(aggregated)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-      
+
     // Specific Mode Logic: Top N + Others
     if (dataType === 'specific' && sorted.length > TOP_SPECIFIC_DISPLAY_COUNT + 1) {
         const topN = sorted.slice(0, TOP_SPECIFIC_DISPLAY_COUNT);
@@ -122,7 +122,7 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
     return Object.keys(specificData).sort();
   }, [specificData]);
 
-  const filteredCountries = availableCountries.filter(c => 
+  const filteredCountries = availableCountries.filter(c =>
     c.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -138,7 +138,7 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
     // 3. Specific Overrides (Common Meta Decks)
     if (name.includes("Golem") || name.includes("Giant") || name.includes("Lava") || name.includes("Electro")) return ARCHETYPE_COLORS["Beatdown"];
     if (name.includes("Hog") || name.includes("Miner") || name.includes("Drill") || name.includes("Barrel")) return ARCHETYPE_COLORS["Cycle"]; // Often Cycle
-    if (name.includes("Pekka") || name.includes("Mega Knight") || name.includes("Ram")) return ARCHETYPE_COLORS["Bridge Spam"]; 
+    if (name.includes("Pekka") || name.includes("Mega Knight") || name.includes("Ram")) return ARCHETYPE_COLORS["Bridge Spam"];
     if (name.includes("X-Bow") || name.includes("Mortar")) return ARCHETYPE_COLORS["Siege"];
     if (name.includes("Log Bait") || name.includes("Fireball Bait")) return ARCHETYPE_COLORS["Spell Bait"];
     if (name.includes("SplashYard")) return ARCHETYPE_COLORS["Control"];
@@ -147,31 +147,31 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
   };
 
   return (
-    <div className="w-full bg-[#0a0a0a] rounded-xl border border-[#262626] p-6 flex flex-col gap-8">
-      
+    <div className="w-full bg-[#f4f7fa] rounded-xl border border-[#e2e8f0] p-6 flex flex-col gap-8">
+
       {/* Top Row: Description (Left) + Map (Right) */}
       <div className="flex flex-col lg:flex-row gap-8">
-        
+
         {/* Left: Description & Header */}
         <div className="w-full lg:w-1/3 flex flex-col justify-center">
           {children}
         </div>
 
         {/* Right: Map */}
-        <div className="w-full lg:w-2/3 bg-[#171717] rounded-lg border border-[#333] overflow-hidden relative h-[300px]">
+        <div className="w-full lg:w-2/3 bg-[#ffffff] rounded-lg border border-[#cbd5e1] overflow-hidden relative h-[300px]">
              <ComposableMap projectionConfig={{ scale: 200, center: [0, 0] }} className="w-full h-full">
                <ZoomableGroup zoom={1}>
                  <Geographies geography={GEO_URL}>
                    {({ geographies }) =>
                      geographies.map((geo) => {
                        // Map uses Numeric ISO (id), Data uses ISO-2
-                       const isoNumeric = String(geo.id); 
+                       const isoNumeric = String(geo.id);
                        // Find matching ISO-2 from our data (Use Specific Data for map coverage)
                        const iso2 = Object.keys(specificData).find(key => ISO2_TO_NUMERIC[key] === isoNumeric);
-                       
+
                        const hasData = !!iso2;
                        const isSelected = selectedCountry === iso2;
-                       
+
                        // Determine if country is in selected region
                        let isInRegion = false;
                        if (viewMode === 'region' && iso2) {
@@ -183,16 +183,16 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                          }
                        }
 
-                       let fill = "#262626";
+                       let fill = "#e2e8f0";
                        if (viewMode === 'global') {
                           if (hasData) fill = "#3b82f6"; // Highlight all with data in global mode
-                          else fill = "#262626";
+                          else fill = "#e2e8f0";
                        } else if (viewMode === 'country') {
                          if (isSelected) fill = "#3b82f6";
-                         else if (hasData) fill = "#404040";
+                         else if (hasData) fill = "#94a3b8";
                        } else if (viewMode === 'region') {
                          if (isInRegion) fill = "#3b82f6";
-                         else if (hasData) fill = "#404040";
+                         else if (hasData) fill = "#94a3b8";
                        }
 
                        return (
@@ -200,11 +200,11 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                            key={geo.rsmKey}
                            geography={geo}
                            fill={fill}
-                           stroke="#171717"
+                           stroke="#ffffff"
                            strokeWidth={0.5}
                            style={{
                              default: { outline: "none" },
-                             hover: { fill: hasData ? "#60a5fa" : "#333", outline: "none", cursor: hasData ? "pointer" : "default" },
+                             hover: { fill: hasData ? "#60a5fa" : "#cbd5e1", outline: "none", cursor: hasData ? "pointer" : "default" },
                              pressed: { outline: "none" },
                            }}
                            onClick={() => {
@@ -219,8 +219,8 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                  </Geographies>
                </ZoomableGroup>
              </ComposableMap>
-           
-           <div className="absolute bottom-4 left-4 bg-black/80 p-2 rounded text-xs text-gray-400 pointer-events-none">
+
+           <div className="absolute bottom-4 left-4 bg-white/95 p-2 rounded text-xs text-slate-600 pointer-events-none">
               {viewMode === 'country' && "Click a highlighted country to select"}
               {viewMode === 'region' && "Countries in selected region highlighted"}
               {viewMode === 'global' && "All countries with data highlighted"}
@@ -229,35 +229,35 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
       </div>
 
       {/* Middle Row: Controls */}
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-[#171717] p-2 rounded-lg border border-[#333]">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-[#ffffff] p-2 rounded-lg border border-[#cbd5e1]">
          {/* Data Type Toggle */}
-         <div className="flex bg-[#262626] rounded-lg p-1">
+         <div className="flex bg-[#e2e8f0] rounded-lg p-1">
             <button
                onClick={() => setDataType('generic')}
-               className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all ${
-                 dataType === 'generic' 
-                   ? 'bg-blue-600 text-white shadow-lg' 
-                   : 'text-gray-400 hover:text-white'
+               className={`px-3 py-1.5 rounded-md text-xs font-bold normal-case transition-all ${
+                 dataType === 'generic'
+                   ? 'bg-blue-600 text-white shadow-lg'
+                   : 'text-slate-600 hover:text-slate-900'
                }`}
              >
                Generic
              </button>
              <button
                onClick={() => setDataType('specific')}
-               className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase transition-all ${
-                 dataType === 'specific' 
-                   ? 'bg-blue-600 text-white shadow-lg' 
-                   : 'text-gray-400 hover:text-white'
+               className={`px-3 py-1.5 rounded-md text-xs font-bold normal-case transition-all ${
+                 dataType === 'specific'
+                   ? 'bg-blue-600 text-white shadow-lg'
+                   : 'text-slate-600 hover:text-slate-900'
                }`}
              >
                Specific
              </button>
          </div>
-         
-         <div className="h-6 w-px bg-[#333]" />
+
+         <div className="h-6 w-px bg-[#cbd5e1]" />
 
         {/* View Mode Selector */}
-        <div className="flex bg-[#262626] rounded-lg p-1">
+        <div className="flex bg-[#e2e8f0] rounded-lg p-1">
           {(['global', 'region', 'country'] as ViewMode[]).map(mode => (
             <button
               key={mode}
@@ -270,9 +270,9 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                 }
               }}
               className={`px-4 py-1.5 rounded-md text-sm font-bold capitalize transition-all ${
-                viewMode === mode 
-                  ? 'bg-blue-600 text-white shadow-lg' 
-                  : 'text-gray-400 hover:text-white'
+                viewMode === mode
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {mode}
@@ -291,7 +291,7 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                   className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border transition-colors ${
                     selectedRegion === r
                       ? 'bg-white text-black border-white'
-                      : 'bg-transparent text-gray-400 border-[#333] hover:border-gray-500'
+                      : 'bg-transparent text-slate-600 border-[#cbd5e1] hover:border-gray-500'
                   }`}
                 >
                   {r}
@@ -302,15 +302,15 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
 
           {viewMode === 'country' && (
             <div className="relative w-full max-w-xs z-20">
-              <input 
-                  type="text" 
-                  placeholder="Search country..." 
+              <input
+                  type="text"
+                  aria-label="Search country code" placeholder="Search country code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#262626] border border-[#333] rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#e2e8f0] border border-[#cbd5e1] rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
               />
               {searchTerm && (
-                <div className="absolute top-full left-0 w-full bg-[#171717] border border-[#333] rounded-lg mt-1 max-h-48 overflow-y-auto shadow-xl z-50">
+                <div className="absolute top-full left-0 w-full bg-[#ffffff] border border-[#cbd5e1] rounded-lg mt-1 max-h-48 overflow-y-auto shadow-xl z-50">
                   {filteredCountries.map(c => (
                     <button
                       key={c}
@@ -318,7 +318,7 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                         setSelectedCountry(c);
                         setSearchTerm('');
                       }}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-[#262626] hover:text-white"
+                      className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-[#e2e8f0] hover:text-slate-900"
                     >
                       {c}
                     </button>
@@ -327,10 +327,10 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
               )}
             </div>
           )}
-          
+
           {/* Current Selection Label */}
-          <div className="ml-auto text-sm text-gray-400 font-medium px-4 border-l border-[#333]">
-             Viewing: <span className="text-white">
+          <div className="ml-auto text-sm text-slate-600 font-medium px-4 border-l border-[#cbd5e1]">
+             Viewing: <span className="text-slate-900">
                {viewMode === 'global' ? 'Global' : viewMode === 'region' ? selectedRegion : selectedCountry}
              </span>
           </div>
@@ -338,24 +338,24 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
       </div>
 
       {/* Bottom Row: Chart & Insights */}
-      <div className="flex flex-col lg:flex-row gap-8 h-[300px]">
+      <div className="flex flex-col lg:flex-row gap-8 lg:h-[300px]">
          {/* Left: Bar Chart */}
-         <div className="w-full lg:w-2/3 flex flex-col">
+         <div className="w-full lg:w-2/3 flex flex-col min-h-[300px]">
            <div className="flex-1">
              {chartData.length > 0 ? (
                <ResponsiveContainer width="100%" height="100%">
                  <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                   <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                   <XAxis 
-                      dataKey="name" 
-                      stroke="#fff" 
+                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
+                   <XAxis
+                      dataKey="name"
+                      stroke="#142a40"
                       tick={({ x, y, payload }) => {
                         const words = payload.value.split(' ');
                         const lineHeight = 12;
                         return (
                           <g transform={`translate(${x},${y})`}>
                             {words.map((word: string, i: number) => (
-                              <text 
+                              <text
                                 key={i}
                                 x={0}
                                 y={0}
@@ -375,11 +375,11 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                       height={60}
                    />
                    <YAxis hide />
-                   <Tooltip 
-                     contentStyle={{ backgroundColor: '#171717', border: '1px solid #333' }}
-                     itemStyle={{ color: '#fff' }}
+                   <Tooltip
+                     contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1' }}
+                     itemStyle={{ color: '#142a40' }}
                      labelStyle={{ color: '#9ca3af', marginBottom: '0.25rem' }}
-                     cursor={{ fill: '#333', opacity: 0.4 }}
+                     cursor={{ fill: '#cbd5e1', opacity: 0.4 }}
                    />
                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                      {chartData.map((entry, index) => (
@@ -389,40 +389,40 @@ export default function RegionalMetaMap({ specificData, genericData, children }:
                  </BarChart>
                </ResponsiveContainer>
              ) : (
-               <div className="h-full flex items-center justify-center text-gray-500">
+               <div className="h-full flex items-center justify-center text-slate-500">
                  No data for selection
                </div>
              )}
            </div>
          </div>
-         
+
          {/* Right: Insights Panel */}
-         <div className="w-full lg:w-1/3 bg-[#171717] rounded-lg border border-[#333] p-6 flex flex-col justify-center gap-4">
+         <div className="w-full lg:w-1/3 bg-[#ffffff] rounded-lg border border-[#cbd5e1] p-6 flex flex-col justify-center gap-4">
             <div>
-              <h4 className="text-gray-400 text-xs uppercase font-bold mb-1">Top Archetype</h4>
-              <div className="text-2xl font-bold text-white mb-2">{chartData[0]?.name || 'N/A'}</div>
-              <div className="w-full bg-[#262626] rounded-full h-2 overflow-hidden">
-                <div 
-                  className="h-full" 
-                  style={{ 
+              <h4 className="text-slate-600 text-xs normal-case font-bold mb-1">Top Archetype</h4>
+              <div className="text-2xl font-bold text-slate-900 mb-2">{chartData[0]?.name || 'N/A'}</div>
+              <div className="w-full bg-[#e2e8f0] rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-full"
+                  style={{
                     width: `${chartData.length > 0 ? (chartData[0].count / totalGames) * 100 : 0}%`,
                     backgroundColor: chartData.length > 0 && chartData[0] ? getBarColor(chartData[0].name) : DEFAULT_COLOR
                   }}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 {chartData.length > 0 ? Math.round((chartData[0].count / totalGames) * 100) : 0}% Dominance
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#333]">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#cbd5e1]">
               <div>
-                <h4 className="text-gray-400 text-xs uppercase font-bold mb-1">Total Decks</h4>
-                <div className="text-xl font-bold text-white">{totalGames}</div>
+                <h4 className="text-slate-600 text-xs normal-case font-bold mb-1">Total Decks</h4>
+                <div className="text-xl font-bold text-slate-900">{totalGames}</div>
               </div>
               <div>
-                <h4 className="text-gray-400 text-xs uppercase font-bold mb-1">Variety</h4>
-                <div className="text-xl font-bold text-white">{chartData.length} <span className="text-xs font-normal text-gray-500">types</span></div>
+                <h4 className="text-slate-600 text-xs normal-case font-bold mb-1">Variety</h4>
+                <div className="text-xl font-bold text-slate-900">{chartData.length} <span className="text-xs font-normal text-slate-500">types</span></div>
               </div>
             </div>
          </div>

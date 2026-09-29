@@ -152,7 +152,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
                             {battle.team.map((p, idx) => (
                                 <div key={idx} className="mb-2 last:mb-0">
                                     <div className="flex justify-between items-center text-xs mb-1">
-                                        <Link href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-blue-400 truncate max-w-[150px] block">
+                                        <Link prefetch={false} href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-blue-400 truncate max-w-[150px] block">
                                             {p.name}
                                         </Link>
                                         <div className="flex items-center gap-1">
@@ -175,7 +175,7 @@ export default function BattleLogAnalytics({ battles, playerTag }: BattleLogAnal
                             {battle.opponent.map((p, idx) => (
                                 <div key={idx} className="mb-2 last:mb-0">
                                     <div className="flex justify-between items-center text-xs mb-1">
-                                        <Link href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-red-400 truncate max-w-[150px] block">
+                                        <Link prefetch={false} href={`/player/${p.tag.replace('#', '')}`} className="text-white hover:text-red-400 truncate max-w-[150px] block">
                                             {p.name}
                                         </Link>
                                         <div className="flex items-center gap-1">

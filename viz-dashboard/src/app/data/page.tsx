@@ -1,35 +1,21 @@
 import DeckList from '@/components/DeckList';
 import LeaderboardList from '@/components/LeaderboardList';
 import CardTable from '@/components/CardTable';
+import SnapshotNote from '@/components/SnapshotNote';
 import metaData from '@/data/meta_snapshot.json';
 
 export default function DataPage() {
-  const { top_cards, top_decks, leaderboards, total_players, total_decks, timestamp } = metaData;
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-      {/* Header */}
-      <div className="flex justify-between items-end border-b border-[#262626] pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Meta Data</h1>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span>Live Analysis: {total_players} Top Players • {total_decks} Battles</span>
-          </div>
-        </div>
+    <main className="page-shell space-y-8">
+      <div>
+        <h1 className="page-heading">Cards & decks</h1>
+        <p className="section-copy mt-4">Browse the combinations behind the charts. Usage and win rates describe this snapshot’s sampled deck observations.</p>
+        <SnapshotNote />
       </div>
-
-      {/* Section 1: Popular Decks */}
-      <DeckList decks={top_decks || []} />
-
-      {/* Section 2: Leaderboards */}
-      <LeaderboardList 
-        players={leaderboards?.players || []} 
-        clans={leaderboards?.clans || []} 
-      />
-
-      {/* Section 3: Card Stats Table */}
-      <CardTable cards={top_cards} />
-    </div>
+      <DeckList decks={metaData.top_decks} />
+      <section aria-label="Leaderboards"><LeaderboardList players={metaData.leaderboards.players} clans={metaData.leaderboards.clans} /></section>
+      <section id="card-stats" className="scroll-mt-24"><CardTable cards={metaData.top_cards} /></section>
+      <p className="section-copy text-xs">Card and deck win rates pool evolution and hero variants. Deck artwork shows the most common observed variant. Live player and clan lookup is currently unavailable.</p>
+    </main>
   );
 }
