@@ -125,7 +125,7 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
 
     // Color Scale for Links
     const maxVal = d3.max(data.links, d => d.value) || 1;
-    const colorScale = d3.scaleSequential(d3.interpolatePlasma)
+    const colorScale = d3.scaleSequential(d3.interpolateBlues)
       .domain([0, maxVal]);
 
     // Zoom Group
@@ -174,13 +174,16 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
 
     // Render Nodes (Groups containing Image)
     const node = g.append("g")
-      .selectAll("g")
+      .selectAll<SVGGElement, GraphNode>("g")
       .data(data.nodes)
       .join("g")
+      .attr("tabindex", 0)
+      .attr("role", "img")
+      .attr("aria-label", d => `${d.name}: focus to highlight connected cards`)
       .call(d3.drag<SVGGElement, GraphNode>()
         .on("start", dragstarted)
         .on("drag", dragged)
-        .on("end", dragended) as any
+        .on("end", dragended)
       );
 
     // Node Image (Full Rectangle)
@@ -197,11 +200,11 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
       .attr("x", 0)
       .attr("y", CONFIG.VISUALS.TEXT_OFFSET_Y)
       .attr("text-anchor", "middle")
-      .attr("fill", "#fff")
+      .attr("fill", "#142a40")
       .attr("font-size", CONFIG.VISUALS.FONT_SIZE)
       .attr("font-family", "sans-serif")
       .attr("pointer-events", "none")
-      .style("text-shadow", "2px 2px 4px #000");
+      ;
 
     // Simulation Tick
     simulation.on("tick", () => {
@@ -216,18 +219,18 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
     });
 
     // Drag Functions
-    function dragstarted(event: any, d: GraphNode) {
+    function dragstarted(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
 
-    function dragged(event: any, d: GraphNode) {
+    function dragged(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
       d.fx = event.x;
       d.fy = event.y;
     }
 
-    function dragended(event: any, d: GraphNode) {
+    function dragended(event: d3.D3DragEvent<SVGGElement, GraphNode, GraphNode>, d: GraphNode) {
       if (!event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
@@ -235,7 +238,7 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
 
     // Hover Effects (Brushing)
     node
-      .on("mouseover", (event, d) => {
+      .on("mouseover focus", (event, d) => {
         setHoveredNode(d.id);
         
         // Dim all nodes and links
@@ -265,7 +268,7 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
           .filter(n => connectedNodeIds.has(n.id))
           .style("opacity", 1);
       })
-      .on("mouseout", () => {
+      .on("mouseout blur", () => {
         setHoveredNode(null);
         node.style("opacity", 1);
         link
@@ -281,37 +284,38 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
   }, [data, dimensions]);
 
   return (
-    <div className="bg-[#171717] border border-[#262626] rounded-lg overflow-hidden h-full min-h-[400px] flex flex-col">
-      <div className="px-3 py-2 border-b border-[#262626] bg-[#1a1a1a] flex justify-between items-center">
-        <h2 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
-          <span className="text-blue-500">🕸️</span> Meta Web (D3.js)
+    <div className="bg-[#ffffff] border border-[#e2e8f0] rounded-lg overflow-hidden h-full min-h-[400px] flex flex-col">
+      <div className="px-3 py-2 border-b border-[#e2e8f0] bg-[#f8fafc] flex justify-between items-center">
+        <h2 className="text-xs font-bold text-slate-700 normal-case tracking-normal flex items-center gap-2">
+          <span className="text-blue-500"></span> Card relationships
         </h2>
-        <span className="text-[10px] text-gray-500 font-mono">
+        <span className="text-[10px] text-slate-500 tabular-nums">
           {hoveredNode ? `Highlighting: ${hoveredNode}` : 'Drag nodes to explore clusters'}
         </span>
       </div>
       
-      <div ref={containerRef} className="flex-1 relative bg-[#0a0a0a] overflow-hidden">
+      <div ref={containerRef} className="flex-1 relative bg-[#f4f7fa] overflow-hidden">
         <svg 
           ref={svgRef}
+          aria-label="Card co-occurrence network"
           width={dimensions.width}
           height={dimensions.height}
           className="cursor-move"
         />
         
         {/* Legend */}
-        <div className="absolute bottom-3 right-3 bg-black/80 p-2 rounded border border-[#333] text-[10px] text-gray-400 max-w-[200px]">
-          <p className="font-bold text-gray-200 mb-2">Synergy Strength</p>
-          <div className="h-2 w-full rounded bg-gradient-to-r from-[#0d0887] via-[#cc4778] to-[#f0f921] mb-1"></div>
-          <div className="flex justify-between text-[9px] text-gray-500 font-mono">
+        <div className="absolute bottom-3 right-3 bg-white/95 p-2 rounded border border-[#cbd5e1] text-[10px] text-slate-600 max-w-[200px]">
+          <p className="font-bold text-slate-800 mb-2">Played together</p>
+          <div className="h-2 w-full rounded bg-gradient-to-r from-blue-100 to-blue-700 mb-1"></div>
+          <div className="flex justify-between text-[9px] text-slate-500 tabular-nums">
             <span>Weak</span>
             <span>Strong</span>
           </div>
-          <div className="mt-2 pt-2 border-t border-[#333]">
-            <p className="font-bold text-gray-200 mb-1">How to read:</p>
+          <div className="mt-2 pt-2 border-t border-[#cbd5e1]">
+            <p className="font-bold text-slate-800 mb-1">How to read:</p>
             <ul className="list-disc pl-3 space-y-1">
               <li>Nodes = Cards</li>
-              <li>Links = Synergies</li>
+              <li>Links = Shared decks</li>
               <li>Color/Width = Strength</li>
             </ul>
           </div>
