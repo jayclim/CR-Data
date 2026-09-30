@@ -3,978 +3,986 @@
   "snapshots": [
     {
       "date": "2026-09-30",
-      "timestamp": "2026-09-30T04:28:39+00:00",
+      "timestamp": "2026-09-30T16:38:27+00:00",
       "total_players": 1000,
-      "total_decks": 26156,
-      "unique_battles": 21844,
+      "total_decks": 26329,
+      "unique_battles": 21827,
       "cards": [
         {
           "id": 28000015,
           "name": "Barbarian Barrel",
-          "count": 9925,
-          "wins": 6076,
-          "usage_rate": 37.95,
-          "win_rate": 61.22
+          "count": 10063,
+          "wins": 6110,
+          "usage_rate": 38.22,
+          "win_rate": 60.72
         },
         {
           "id": 26000010,
           "name": "Skeletons",
-          "count": 9366,
-          "wins": 5643,
-          "usage_rate": 35.81,
-          "win_rate": 60.25
+          "count": 9687,
+          "wins": 5807,
+          "usage_rate": 36.79,
+          "win_rate": 59.95
         },
         {
           "id": 28000008,
           "name": "Zap",
-          "count": 6243,
-          "wins": 3797,
-          "usage_rate": 23.87,
-          "win_rate": 60.82
+          "count": 6647,
+          "wins": 4022,
+          "usage_rate": 25.25,
+          "win_rate": 60.51
         },
         {
           "id": 28000000,
           "name": "Fireball",
-          "count": 6184,
-          "wins": 3753,
-          "usage_rate": 23.64,
-          "win_rate": 60.69
+          "count": 5899,
+          "wins": 3577,
+          "usage_rate": 22.4,
+          "win_rate": 60.64
         },
         {
           "id": 26000107,
           "name": "Minion Giant",
-          "count": 5864,
-          "wins": 3579,
-          "usage_rate": 22.42,
-          "win_rate": 61.03
+          "count": 5842,
+          "wins": 3555,
+          "usage_rate": 22.19,
+          "win_rate": 60.85
         },
         {
           "id": 26000050,
           "name": "Royal Ghost",
-          "count": 4519,
-          "wins": 2714,
-          "usage_rate": 17.28,
-          "win_rate": 60.06
+          "count": 4265,
+          "wins": 2546,
+          "usage_rate": 16.2,
+          "win_rate": 59.7
         },
         {
           "id": 26000074,
           "name": "Golden Knight",
-          "count": 4299,
-          "wins": 2573,
-          "usage_rate": 16.44,
-          "win_rate": 59.85
-        },
-        {
-          "id": 28000012,
-          "name": "Tornado",
-          "count": 4079,
-          "wins": 2418,
-          "usage_rate": 15.59,
-          "win_rate": 59.28
-        },
-        {
-          "id": 26000084,
-          "name": "Electro Spirit",
-          "count": 3983,
-          "wins": 2378,
-          "usage_rate": 15.23,
-          "win_rate": 59.7
-        },
-        {
-          "id": 28000001,
-          "name": "Arrows",
-          "count": 3810,
-          "wins": 2310,
-          "usage_rate": 14.57,
-          "win_rate": 60.63
+          "count": 4262,
+          "wins": 2582,
+          "usage_rate": 16.19,
+          "win_rate": 60.58
         },
         {
           "id": 28000009,
           "name": "Poison",
-          "count": 3782,
-          "wins": 2308,
-          "usage_rate": 14.46,
-          "win_rate": 61.03
+          "count": 4200,
+          "wins": 2555,
+          "usage_rate": 15.95,
+          "win_rate": 60.83
         },
         {
           "id": 27000000,
           "name": "Cannon",
-          "count": 3596,
-          "wins": 2203,
-          "usage_rate": 13.75,
-          "win_rate": 61.26
+          "count": 4092,
+          "wins": 2490,
+          "usage_rate": 15.54,
+          "win_rate": 60.85
+        },
+        {
+          "id": 28000012,
+          "name": "Tornado",
+          "count": 4037,
+          "wins": 2383,
+          "usage_rate": 15.33,
+          "win_rate": 59.03
+        },
+        {
+          "id": 26000084,
+          "name": "Electro Spirit",
+          "count": 3803,
+          "wins": 2264,
+          "usage_rate": 14.44,
+          "win_rate": 59.53
+        },
+        {
+          "id": 28000001,
+          "name": "Arrows",
+          "count": 3738,
+          "wins": 2228,
+          "usage_rate": 14.2,
+          "win_rate": 59.6
         },
         {
           "id": 26000049,
           "name": "Bats",
-          "count": 3488,
-          "wins": 2164,
-          "usage_rate": 13.34,
-          "win_rate": 62.04
+          "count": 3662,
+          "wins": 2234,
+          "usage_rate": 13.91,
+          "win_rate": 61.0
         },
         {
           "id": 26000015,
           "name": "Baby Dragon",
-          "count": 3470,
-          "wins": 2081,
-          "usage_rate": 13.27,
-          "win_rate": 59.97
-        },
-        {
-          "id": 28000011,
-          "name": "The Log",
-          "count": 3425,
-          "wins": 2001,
-          "usage_rate": 13.09,
-          "win_rate": 58.42
-        },
-        {
-          "id": 26000000,
-          "name": "Knight",
-          "count": 3289,
-          "wins": 1954,
-          "usage_rate": 12.57,
-          "win_rate": 59.41
-        },
-        {
-          "id": 26000036,
-          "name": "Battle Ram",
-          "count": 3199,
-          "wins": 1909,
-          "usage_rate": 12.23,
-          "win_rate": 59.67
-        },
-        {
-          "id": 28000007,
-          "name": "Lightning",
-          "count": 3187,
-          "wins": 1933,
-          "usage_rate": 12.18,
-          "win_rate": 60.65
+          "count": 3339,
+          "wins": 2041,
+          "usage_rate": 12.68,
+          "win_rate": 61.13
         },
         {
           "id": 26000042,
           "name": "Electro Wizard",
-          "count": 3155,
-          "wins": 1883,
-          "usage_rate": 12.06,
-          "win_rate": 59.68
+          "count": 3203,
+          "wins": 1924,
+          "usage_rate": 12.17,
+          "win_rate": 60.07
         },
         {
-          "id": 27000006,
-          "name": "Tesla",
-          "count": 2877,
-          "wins": 1730,
-          "usage_rate": 11.0,
-          "win_rate": 60.13
+          "id": 28000011,
+          "name": "The Log",
+          "count": 3168,
+          "wins": 1832,
+          "usage_rate": 12.03,
+          "win_rate": 57.83
         },
         {
-          "id": 26000046,
-          "name": "Bandit",
-          "count": 2857,
-          "wins": 1710,
-          "usage_rate": 10.92,
-          "win_rate": 59.85
+          "id": 26000000,
+          "name": "Knight",
+          "count": 3086,
+          "wins": 1842,
+          "usage_rate": 11.72,
+          "win_rate": 59.69
         },
         {
-          "id": 27000001,
-          "name": "Goblin Hut",
-          "count": 2847,
-          "wins": 1685,
-          "usage_rate": 10.88,
-          "win_rate": 59.19
+          "id": 28000007,
+          "name": "Lightning",
+          "count": 3077,
+          "wins": 1868,
+          "usage_rate": 11.69,
+          "win_rate": 60.71
+        },
+        {
+          "id": 26000036,
+          "name": "Battle Ram",
+          "count": 3045,
+          "wins": 1829,
+          "usage_rate": 11.57,
+          "win_rate": 60.07
         },
         {
           "id": 26000023,
           "name": "Ice Wizard",
-          "count": 2843,
-          "wins": 1688,
-          "usage_rate": 10.87,
-          "win_rate": 59.37
+          "count": 2908,
+          "wins": 1729,
+          "usage_rate": 11.04,
+          "win_rate": 59.46
         },
         {
-          "id": 26000018,
-          "name": "Mini P.E.K.K.A",
-          "count": 2541,
-          "wins": 1530,
-          "usage_rate": 9.71,
-          "win_rate": 60.21
+          "id": 26000046,
+          "name": "Bandit",
+          "count": 2856,
+          "wins": 1732,
+          "usage_rate": 10.85,
+          "win_rate": 60.64
         },
         {
-          "id": 26000083,
-          "name": "Mother Witch",
-          "count": 2523,
-          "wins": 1502,
-          "usage_rate": 9.65,
-          "win_rate": 59.53
+          "id": 27000006,
+          "name": "Tesla",
+          "count": 2809,
+          "wins": 1660,
+          "usage_rate": 10.67,
+          "win_rate": 59.1
+        },
+        {
+          "id": 27000001,
+          "name": "Goblin Hut",
+          "count": 2725,
+          "wins": 1631,
+          "usage_rate": 10.35,
+          "win_rate": 59.85
         },
         {
           "id": 26000030,
           "name": "Ice Spirit",
-          "count": 2474,
-          "wins": 1461,
-          "usage_rate": 9.46,
-          "win_rate": 59.05
-        },
-        {
-          "id": 26000005,
-          "name": "Minions",
-          "count": 2446,
-          "wins": 1443,
-          "usage_rate": 9.35,
-          "win_rate": 58.99
-        },
-        {
-          "id": 26000003,
-          "name": "Giant",
-          "count": 2438,
-          "wins": 1463,
-          "usage_rate": 9.32,
-          "win_rate": 60.01
-        },
-        {
-          "id": 26000014,
-          "name": "Musketeer",
-          "count": 2415,
-          "wins": 1422,
-          "usage_rate": 9.23,
-          "win_rate": 58.88
-        },
-        {
-          "id": 26000037,
-          "name": "Inferno Dragon",
-          "count": 2240,
-          "wins": 1342,
-          "usage_rate": 8.56,
-          "win_rate": 59.91
+          "count": 2642,
+          "wins": 1564,
+          "usage_rate": 10.03,
+          "win_rate": 59.2
         },
         {
           "id": 26000101,
           "name": "Rune Giant",
-          "count": 2230,
-          "wins": 1428,
-          "usage_rate": 8.53,
-          "win_rate": 64.04
+          "count": 2622,
+          "wins": 1635,
+          "usage_rate": 9.96,
+          "win_rate": 62.36
+        },
+        {
+          "id": 26000018,
+          "name": "Mini P.E.K.K.A",
+          "count": 2548,
+          "wins": 1526,
+          "usage_rate": 9.68,
+          "win_rate": 59.89
+        },
+        {
+          "id": 26000083,
+          "name": "Mother Witch",
+          "count": 2520,
+          "wins": 1505,
+          "usage_rate": 9.57,
+          "win_rate": 59.72
         },
         {
           "id": 26000093,
           "name": "Little Prince",
-          "count": 2106,
-          "wins": 1349,
-          "usage_rate": 8.05,
-          "win_rate": 64.06
+          "count": 2480,
+          "wins": 1541,
+          "usage_rate": 9.42,
+          "win_rate": 62.14
         },
         {
-          "id": 26000021,
-          "name": "Hog Rider",
-          "count": 2101,
-          "wins": 1244,
-          "usage_rate": 8.03,
-          "win_rate": 59.21
-        },
-        {
-          "id": 26000012,
-          "name": "Skeleton Army",
-          "count": 2079,
-          "wins": 1229,
-          "usage_rate": 7.95,
-          "win_rate": 59.11
+          "id": 26000003,
+          "name": "Giant",
+          "count": 2464,
+          "wins": 1451,
+          "usage_rate": 9.36,
+          "win_rate": 58.89
         },
         {
           "id": 28000016,
           "name": "Heal Spirit",
-          "count": 2046,
-          "wins": 1229,
-          "usage_rate": 7.82,
-          "win_rate": 60.07
+          "count": 2393,
+          "wins": 1412,
+          "usage_rate": 9.09,
+          "win_rate": 59.01
         },
         {
-          "id": 26000034,
-          "name": "Bowler",
-          "count": 2019,
-          "wins": 1220,
-          "usage_rate": 7.72,
-          "win_rate": 60.43
+          "id": 26000005,
+          "name": "Minions",
+          "count": 2387,
+          "wins": 1436,
+          "usage_rate": 9.07,
+          "win_rate": 60.16
         },
         {
-          "id": 26000065,
-          "name": "Mighty Miner",
-          "count": 2011,
-          "wins": 1205,
-          "usage_rate": 7.69,
-          "win_rate": 59.92
+          "id": 26000014,
+          "name": "Musketeer",
+          "count": 2377,
+          "wins": 1422,
+          "usage_rate": 9.03,
+          "win_rate": 59.82
         },
         {
-          "id": 28000017,
-          "name": "Giant Snowball",
-          "count": 1989,
-          "wins": 1208,
-          "usage_rate": 7.6,
-          "win_rate": 60.73
+          "id": 26000021,
+          "name": "Hog Rider",
+          "count": 2175,
+          "wins": 1291,
+          "usage_rate": 8.26,
+          "win_rate": 59.36
         },
         {
           "id": 26000106,
           "name": "Ronin",
-          "count": 1972,
-          "wins": 1171,
-          "usage_rate": 7.54,
-          "win_rate": 59.38
+          "count": 2129,
+          "wins": 1226,
+          "usage_rate": 8.09,
+          "win_rate": 57.59
+        },
+        {
+          "id": 28000017,
+          "name": "Giant Snowball",
+          "count": 2070,
+          "wins": 1249,
+          "usage_rate": 7.86,
+          "win_rate": 60.34
+        },
+        {
+          "id": 26000012,
+          "name": "Skeleton Army",
+          "count": 1981,
+          "wins": 1174,
+          "usage_rate": 7.52,
+          "win_rate": 59.26
+        },
+        {
+          "id": 26000065,
+          "name": "Mighty Miner",
+          "count": 1942,
+          "wins": 1167,
+          "usage_rate": 7.38,
+          "win_rate": 60.09
         },
         {
           "id": 26000038,
           "name": "Ice Golem",
-          "count": 1906,
-          "wins": 1113,
-          "usage_rate": 7.29,
-          "win_rate": 58.39
+          "count": 1942,
+          "wins": 1149,
+          "usage_rate": 7.38,
+          "win_rate": 59.17
         },
         {
-          "id": 26000032,
-          "name": "Miner",
-          "count": 1876,
-          "wins": 1134,
-          "usage_rate": 7.17,
-          "win_rate": 60.45
+          "id": 26000034,
+          "name": "Bowler",
+          "count": 1928,
+          "wins": 1161,
+          "usage_rate": 7.32,
+          "win_rate": 60.22
+        },
+        {
+          "id": 26000037,
+          "name": "Inferno Dragon",
+          "count": 1859,
+          "wins": 1125,
+          "usage_rate": 7.06,
+          "win_rate": 60.52
         },
         {
           "id": 27000010,
           "name": "Furnace",
-          "count": 1770,
-          "wins": 1075,
-          "usage_rate": 6.77,
-          "win_rate": 60.73
-        },
-        {
-          "id": 28000010,
-          "name": "Graveyard",
-          "count": 1692,
-          "wins": 1003,
-          "usage_rate": 6.47,
-          "win_rate": 59.28
-        },
-        {
-          "id": 26000022,
-          "name": "Minion Horde",
-          "count": 1631,
-          "wins": 962,
-          "usage_rate": 6.24,
-          "win_rate": 58.98
-        },
-        {
-          "id": 26000052,
-          "name": "Zappies",
-          "count": 1575,
-          "wins": 915,
-          "usage_rate": 6.02,
-          "win_rate": 58.1
-        },
-        {
-          "id": 26000099,
-          "name": "Goblinstein",
-          "count": 1560,
-          "wins": 944,
-          "usage_rate": 5.96,
-          "win_rate": 60.51
-        },
-        {
-          "id": 28000002,
-          "name": "Rage",
-          "count": 1494,
-          "wins": 903,
-          "usage_rate": 5.71,
-          "win_rate": 60.44
-        },
-        {
-          "id": 28000005,
-          "name": "Freeze",
-          "count": 1485,
-          "wins": 869,
-          "usage_rate": 5.68,
-          "win_rate": 58.52
+          "count": 1830,
+          "wins": 1103,
+          "usage_rate": 6.95,
+          "win_rate": 60.27
         },
         {
           "id": 26000043,
           "name": "Elite Barbarians",
-          "count": 1477,
-          "wins": 958,
-          "usage_rate": 5.65,
-          "win_rate": 64.86
+          "count": 1730,
+          "wins": 1052,
+          "usage_rate": 6.57,
+          "win_rate": 60.81
         },
         {
-          "id": 26000054,
-          "name": "Cannon Cart",
-          "count": 1450,
-          "wins": 905,
-          "usage_rate": 5.54,
-          "win_rate": 62.41
+          "id": 26000022,
+          "name": "Minion Horde",
+          "count": 1718,
+          "wins": 1013,
+          "usage_rate": 6.53,
+          "win_rate": 58.96
         },
         {
-          "id": 26000041,
-          "name": "Goblin Gang",
-          "count": 1446,
-          "wins": 909,
-          "usage_rate": 5.53,
-          "win_rate": 62.86
+          "id": 28000002,
+          "name": "Rage",
+          "count": 1699,
+          "wins": 999,
+          "usage_rate": 6.45,
+          "win_rate": 58.8
         },
         {
           "id": 27000007,
           "name": "Elixir Collector",
-          "count": 1445,
-          "wins": 898,
-          "usage_rate": 5.52,
-          "win_rate": 62.15
+          "count": 1697,
+          "wins": 1018,
+          "usage_rate": 6.45,
+          "win_rate": 59.99
         },
         {
-          "id": 27000002,
-          "name": "Mortar",
-          "count": 1440,
-          "wins": 907,
-          "usage_rate": 5.51,
-          "win_rate": 62.99
+          "id": 26000032,
+          "name": "Miner",
+          "count": 1679,
+          "wins": 989,
+          "usage_rate": 6.38,
+          "win_rate": 58.9
         },
         {
-          "id": 27000012,
-          "name": "Goblin Cage",
-          "count": 1394,
-          "wins": 843,
-          "usage_rate": 5.33,
-          "win_rate": 60.47
+          "id": 28000010,
+          "name": "Graveyard",
+          "count": 1567,
+          "wins": 945,
+          "usage_rate": 5.95,
+          "win_rate": 60.31
+        },
+        {
+          "id": 26000054,
+          "name": "Cannon Cart",
+          "count": 1564,
+          "wins": 976,
+          "usage_rate": 5.94,
+          "win_rate": 62.4
         },
         {
           "id": 26000033,
           "name": "Sparky",
-          "count": 1389,
-          "wins": 815,
-          "usage_rate": 5.31,
-          "win_rate": 58.68
+          "count": 1541,
+          "wins": 918,
+          "usage_rate": 5.85,
+          "win_rate": 59.57
         },
         {
-          "id": 26000039,
-          "name": "Mega Minion",
-          "count": 1325,
-          "wins": 806,
-          "usage_rate": 5.07,
-          "win_rate": 60.83
+          "id": 26000052,
+          "name": "Zappies",
+          "count": 1527,
+          "wins": 905,
+          "usage_rate": 5.8,
+          "win_rate": 59.27
         },
         {
-          "id": 26000026,
-          "name": "Princess",
-          "count": 1311,
-          "wins": 780,
-          "usage_rate": 5.01,
-          "win_rate": 59.5
+          "id": 27000002,
+          "name": "Mortar",
+          "count": 1452,
+          "wins": 912,
+          "usage_rate": 5.51,
+          "win_rate": 62.81
         },
         {
           "id": 26000009,
           "name": "Golem",
-          "count": 1286,
-          "wins": 817,
-          "usage_rate": 4.92,
-          "win_rate": 63.53
-        },
-        {
-          "id": 26000004,
-          "name": "P.E.K.K.A",
-          "count": 1274,
-          "wins": 773,
-          "usage_rate": 4.87,
-          "win_rate": 60.68
-        },
-        {
-          "id": 26000006,
-          "name": "Balloon",
-          "count": 1235,
-          "wins": 728,
-          "usage_rate": 4.72,
-          "win_rate": 58.95
-        },
-        {
-          "id": 28000014,
-          "name": "Earthquake",
-          "count": 1228,
-          "wins": 733,
-          "usage_rate": 4.69,
-          "win_rate": 59.69
+          "count": 1402,
+          "wins": 854,
+          "usage_rate": 5.32,
+          "win_rate": 60.91
         },
         {
           "id": 26000027,
           "name": "Dark Prince",
-          "count": 1223,
-          "wins": 738,
-          "usage_rate": 4.68,
-          "win_rate": 60.34
+          "count": 1400,
+          "wins": 837,
+          "usage_rate": 5.32,
+          "win_rate": 59.79
         },
         {
-          "id": 26000056,
-          "name": "Skeleton Barrel",
-          "count": 1219,
-          "wins": 754,
-          "usage_rate": 4.66,
-          "win_rate": 61.85
+          "id": 26000099,
+          "name": "Goblinstein",
+          "count": 1376,
+          "wins": 831,
+          "usage_rate": 5.23,
+          "win_rate": 60.39
         },
         {
           "id": 26000011,
           "name": "Valkyrie",
-          "count": 1217,
-          "wins": 730,
-          "usage_rate": 4.65,
-          "win_rate": 59.98
+          "count": 1339,
+          "wins": 795,
+          "usage_rate": 5.09,
+          "win_rate": 59.37
+        },
+        {
+          "id": 26000004,
+          "name": "P.E.K.K.A",
+          "count": 1339,
+          "wins": 820,
+          "usage_rate": 5.09,
+          "win_rate": 61.24
+        },
+        {
+          "id": 28000005,
+          "name": "Freeze",
+          "count": 1315,
+          "wins": 767,
+          "usage_rate": 4.99,
+          "win_rate": 58.33
+        },
+        {
+          "id": 26000041,
+          "name": "Goblin Gang",
+          "count": 1290,
+          "wins": 793,
+          "usage_rate": 4.9,
+          "win_rate": 61.47
+        },
+        {
+          "id": 26000039,
+          "name": "Mega Minion",
+          "count": 1288,
+          "wins": 757,
+          "usage_rate": 4.89,
+          "win_rate": 58.77
+        },
+        {
+          "id": 27000012,
+          "name": "Goblin Cage",
+          "count": 1235,
+          "wins": 758,
+          "usage_rate": 4.69,
+          "win_rate": 61.38
+        },
+        {
+          "id": 26000026,
+          "name": "Princess",
+          "count": 1227,
+          "wins": 712,
+          "usage_rate": 4.66,
+          "win_rate": 58.03
         },
         {
           "id": 26000007,
           "name": "Witch",
-          "count": 1213,
-          "wins": 745,
-          "usage_rate": 4.64,
-          "win_rate": 61.42
+          "count": 1189,
+          "wins": 707,
+          "usage_rate": 4.52,
+          "win_rate": 59.46
+        },
+        {
+          "id": 28000014,
+          "name": "Earthquake",
+          "count": 1186,
+          "wins": 685,
+          "usage_rate": 4.5,
+          "win_rate": 57.76
         },
         {
           "id": 26000017,
           "name": "Wizard",
-          "count": 1212,
-          "wins": 693,
-          "usage_rate": 4.63,
-          "win_rate": 57.18
-        },
-        {
-          "id": 26000040,
-          "name": "Dart Goblin",
-          "count": 1183,
-          "wins": 717,
-          "usage_rate": 4.52,
-          "win_rate": 60.61
-        },
-        {
-          "id": 26000053,
-          "name": "Rascals",
-          "count": 1162,
-          "wins": 740,
-          "usage_rate": 4.44,
-          "win_rate": 63.68
+          "count": 1186,
+          "wins": 691,
+          "usage_rate": 4.5,
+          "win_rate": 58.26
         },
         {
           "id": 28000004,
           "name": "Goblin Barrel",
-          "count": 1140,
-          "wins": 693,
+          "count": 1156,
+          "wins": 686,
+          "usage_rate": 4.39,
+          "win_rate": 59.34
+        },
+        {
+          "id": 26000056,
+          "name": "Skeleton Barrel",
+          "count": 1148,
+          "wins": 722,
           "usage_rate": 4.36,
-          "win_rate": 60.79
+          "win_rate": 62.89
         },
         {
-          "id": 26000048,
-          "name": "Night Witch",
-          "count": 1125,
-          "wins": 710,
-          "usage_rate": 4.3,
-          "win_rate": 63.11
+          "id": 26000040,
+          "name": "Dart Goblin",
+          "count": 1135,
+          "wins": 658,
+          "usage_rate": 4.31,
+          "win_rate": 57.97
         },
         {
-          "id": 26000058,
-          "name": "Wall Breakers",
-          "count": 1040,
-          "wins": 612,
-          "usage_rate": 3.98,
-          "win_rate": 58.85
-        },
-        {
-          "id": 26000085,
-          "name": "Electro Giant",
-          "count": 1033,
-          "wins": 643,
-          "usage_rate": 3.95,
-          "win_rate": 62.25
-        },
-        {
-          "id": 26000013,
-          "name": "Bomber",
-          "count": 999,
-          "wins": 619,
-          "usage_rate": 3.82,
-          "win_rate": 61.96
-        },
-        {
-          "id": 26000059,
-          "name": "Royal Hogs",
-          "count": 979,
-          "wins": 559,
-          "usage_rate": 3.74,
-          "win_rate": 57.1
-        },
-        {
-          "id": 26000064,
-          "name": "Firecracker",
-          "count": 963,
-          "wins": 572,
-          "usage_rate": 3.68,
-          "win_rate": 59.4
-        },
-        {
-          "id": 26000020,
-          "name": "Giant Skeleton",
-          "count": 941,
-          "wins": 564,
-          "usage_rate": 3.6,
-          "win_rate": 59.94
+          "id": 26000053,
+          "name": "Rascals",
+          "count": 1114,
+          "wins": 687,
+          "usage_rate": 4.23,
+          "win_rate": 61.67
         },
         {
           "id": 26000044,
           "name": "Hunter",
-          "count": 931,
-          "wins": 548,
-          "usage_rate": 3.56,
-          "win_rate": 58.86
+          "count": 1113,
+          "wins": 660,
+          "usage_rate": 4.23,
+          "win_rate": 59.3
         },
         {
-          "id": 27000009,
-          "name": "Tombstone",
-          "count": 901,
-          "wins": 536,
-          "usage_rate": 3.44,
-          "win_rate": 59.49
+          "id": 26000006,
+          "name": "Balloon",
+          "count": 1056,
+          "wins": 631,
+          "usage_rate": 4.01,
+          "win_rate": 59.75
+        },
+        {
+          "id": 26000048,
+          "name": "Night Witch",
+          "count": 1055,
+          "wins": 642,
+          "usage_rate": 4.01,
+          "win_rate": 60.85
+        },
+        {
+          "id": 26000058,
+          "name": "Wall Breakers",
+          "count": 1010,
+          "wins": 578,
+          "usage_rate": 3.84,
+          "win_rate": 57.23
+        },
+        {
+          "id": 26000085,
+          "name": "Electro Giant",
+          "count": 996,
+          "wins": 628,
+          "usage_rate": 3.78,
+          "win_rate": 63.05
+        },
+        {
+          "id": 26000059,
+          "name": "Royal Hogs",
+          "count": 976,
+          "wins": 560,
+          "usage_rate": 3.71,
+          "win_rate": 57.38
         },
         {
           "id": 26000072,
           "name": "Archer Queen",
-          "count": 879,
-          "wins": 508,
-          "usage_rate": 3.36,
-          "win_rate": 57.79
+          "count": 964,
+          "wins": 545,
+          "usage_rate": 3.66,
+          "win_rate": 56.54
+        },
+        {
+          "id": 27000009,
+          "name": "Tombstone",
+          "count": 962,
+          "wins": 594,
+          "usage_rate": 3.65,
+          "win_rate": 61.75
         },
         {
           "id": 26000080,
           "name": "Skeleton Dragons",
-          "count": 861,
-          "wins": 558,
-          "usage_rate": 3.29,
-          "win_rate": 64.81
+          "count": 941,
+          "wins": 574,
+          "usage_rate": 3.57,
+          "win_rate": 61.0
+        },
+        {
+          "id": 26000008,
+          "name": "Barbarians",
+          "count": 923,
+          "wins": 568,
+          "usage_rate": 3.51,
+          "win_rate": 61.54
+        },
+        {
+          "id": 26000013,
+          "name": "Bomber",
+          "count": 900,
+          "wins": 534,
+          "usage_rate": 3.42,
+          "win_rate": 59.33
         },
         {
           "id": 26000001,
           "name": "Archers",
-          "count": 860,
-          "wins": 507,
+          "count": 866,
+          "wins": 516,
           "usage_rate": 3.29,
-          "win_rate": 58.95
+          "win_rate": 59.58
+        },
+        {
+          "id": 27000013,
+          "name": "Goblin Drill",
+          "count": 862,
+          "wins": 532,
+          "usage_rate": 3.27,
+          "win_rate": 61.72
+        },
+        {
+          "id": 26000064,
+          "name": "Firecracker",
+          "count": 840,
+          "wins": 493,
+          "usage_rate": 3.19,
+          "win_rate": 58.69
+        },
+        {
+          "id": 26000020,
+          "name": "Giant Skeleton",
+          "count": 794,
+          "wins": 479,
+          "usage_rate": 3.02,
+          "win_rate": 60.33
+        },
+        {
+          "id": 28000018,
+          "name": "Royal Delivery",
+          "count": 792,
+          "wins": 444,
+          "usage_rate": 3.01,
+          "win_rate": 56.06
         },
         {
           "id": 28000026,
           "name": "Vines",
-          "count": 794,
-          "wins": 476,
-          "usage_rate": 3.04,
-          "win_rate": 59.95
+          "count": 784,
+          "wins": 465,
+          "usage_rate": 2.98,
+          "win_rate": 59.31
         },
         {
-          "id": 26000035,
-          "name": "Lumberjack",
-          "count": 791,
-          "wins": 469,
-          "usage_rate": 3.02,
-          "win_rate": 59.29
-        },
-        {
-          "id": 27000004,
-          "name": "Bomb Tower",
-          "count": 786,
-          "wins": 478,
-          "usage_rate": 3.01,
-          "win_rate": 60.81
+          "id": 26000069,
+          "name": "Skeleton King",
+          "count": 784,
+          "wins": 471,
+          "usage_rate": 2.98,
+          "win_rate": 60.08
         },
         {
           "id": 28000003,
           "name": "Rocket",
           "count": 755,
-          "wins": 454,
-          "usage_rate": 2.89,
-          "win_rate": 60.13
-        },
-        {
-          "id": 26000029,
-          "name": "Lava Hound",
-          "count": 751,
-          "wins": 462,
+          "wins": 439,
           "usage_rate": 2.87,
-          "win_rate": 61.52
-        },
-        {
-          "id": 26000008,
-          "name": "Barbarians",
-          "count": 749,
-          "wins": 442,
-          "usage_rate": 2.86,
-          "win_rate": 59.01
+          "win_rate": 58.15
         },
         {
           "id": 26000045,
           "name": "Executioner",
           "count": 747,
           "wins": 444,
-          "usage_rate": 2.86,
+          "usage_rate": 2.84,
           "win_rate": 59.44
         },
         {
           "id": 26000031,
           "name": "Fire Spirit",
-          "count": 721,
-          "wins": 443,
-          "usage_rate": 2.76,
-          "win_rate": 61.44
+          "count": 738,
+          "wins": 455,
+          "usage_rate": 2.8,
+          "win_rate": 61.65
         },
         {
-          "id": 27000013,
-          "name": "Goblin Drill",
-          "count": 715,
-          "wins": 435,
-          "usage_rate": 2.73,
-          "win_rate": 60.84
-        },
-        {
-          "id": 26000002,
-          "name": "Goblins",
-          "count": 711,
-          "wins": 444,
-          "usage_rate": 2.72,
-          "win_rate": 62.45
+          "id": 26000035,
+          "name": "Lumberjack",
+          "count": 730,
+          "wins": 423,
+          "usage_rate": 2.77,
+          "win_rate": 57.95
         },
         {
           "id": 26000102,
           "name": "Berserker",
-          "count": 699,
-          "wins": 432,
-          "usage_rate": 2.67,
-          "win_rate": 61.8
+          "count": 726,
+          "wins": 419,
+          "usage_rate": 2.76,
+          "win_rate": 57.71
         },
         {
-          "id": 26000069,
-          "name": "Skeleton King",
-          "count": 698,
-          "wins": 438,
-          "usage_rate": 2.67,
-          "win_rate": 62.75
-        },
-        {
-          "id": 28000018,
-          "name": "Royal Delivery",
-          "count": 691,
-          "wins": 392,
-          "usage_rate": 2.64,
-          "win_rate": 56.73
-        },
-        {
-          "id": 26000025,
-          "name": "Guards",
-          "count": 686,
-          "wins": 406,
-          "usage_rate": 2.62,
-          "win_rate": 59.18
-        },
-        {
-          "id": 26000055,
-          "name": "Mega Knight",
-          "count": 583,
-          "wins": 338,
-          "usage_rate": 2.23,
-          "win_rate": 57.98
+          "id": 26000029,
+          "name": "Lava Hound",
+          "count": 718,
+          "wins": 451,
+          "usage_rate": 2.73,
+          "win_rate": 62.81
         },
         {
           "id": 26000028,
           "name": "Three Musketeers",
-          "count": 562,
-          "wins": 339,
-          "usage_rate": 2.15,
-          "win_rate": 60.32
+          "count": 700,
+          "wins": 416,
+          "usage_rate": 2.66,
+          "win_rate": 59.43
         },
         {
           "id": 26000063,
           "name": "Electro Dragon",
-          "count": 559,
-          "wins": 361,
-          "usage_rate": 2.14,
-          "win_rate": 64.58
+          "count": 695,
+          "wins": 400,
+          "usage_rate": 2.64,
+          "win_rate": 57.55
         },
         {
-          "id": 27000003,
-          "name": "Inferno Tower",
-          "count": 550,
-          "wins": 318,
-          "usage_rate": 2.1,
-          "win_rate": 57.82
+          "id": 27000004,
+          "name": "Bomb Tower",
+          "count": 666,
+          "wins": 398,
+          "usage_rate": 2.53,
+          "win_rate": 59.76
         },
         {
-          "id": 26000024,
-          "name": "Royal Giant",
-          "count": 528,
-          "wins": 314,
-          "usage_rate": 2.02,
-          "win_rate": 59.47
-        },
-        {
-          "id": 26000016,
-          "name": "Prince",
-          "count": 517,
-          "wins": 338,
-          "usage_rate": 1.98,
-          "win_rate": 65.38
+          "id": 26000002,
+          "name": "Goblins",
+          "count": 583,
+          "wins": 355,
+          "usage_rate": 2.21,
+          "win_rate": 60.89
         },
         {
           "id": 26000061,
           "name": "Fisherman",
-          "count": 515,
-          "wins": 310,
-          "usage_rate": 1.97,
-          "win_rate": 60.19
-        },
-        {
-          "id": 26000067,
-          "name": "Elixir Golem",
-          "count": 513,
-          "wins": 311,
-          "usage_rate": 1.96,
-          "win_rate": 60.62
-        },
-        {
-          "id": 28000024,
-          "name": "Goblin Curse",
-          "count": 474,
-          "wins": 293,
-          "usage_rate": 1.81,
-          "win_rate": 61.81
-        },
-        {
-          "id": 26000087,
-          "name": "Phoenix",
-          "count": 430,
-          "wins": 284,
-          "usage_rate": 1.64,
-          "win_rate": 66.05
-        },
-        {
-          "id": 26000019,
-          "name": "Spear Goblins",
-          "count": 426,
-          "wins": 271,
-          "usage_rate": 1.63,
-          "win_rate": 63.62
-        },
-        {
-          "id": 26000047,
-          "name": "Royal Recruits",
-          "count": 384,
-          "wins": 215,
-          "usage_rate": 1.47,
-          "win_rate": 55.99
-        },
-        {
-          "id": 26000095,
-          "name": "Goblin Demolisher",
-          "count": 383,
-          "wins": 241,
-          "usage_rate": 1.46,
-          "win_rate": 62.92
-        },
-        {
-          "id": 27000008,
-          "name": "X-Bow",
-          "count": 366,
-          "wins": 203,
-          "usage_rate": 1.4,
-          "win_rate": 55.46
-        },
-        {
-          "id": 26000097,
-          "name": "Suspicious Bush",
-          "count": 332,
-          "wins": 205,
-          "usage_rate": 1.27,
-          "win_rate": 61.75
+          "count": 571,
+          "wins": 339,
+          "usage_rate": 2.17,
+          "win_rate": 59.37
         },
         {
           "id": 26000103,
           "name": "Boss Bandit",
-          "count": 315,
-          "wins": 187,
-          "usage_rate": 1.2,
-          "win_rate": 59.37
+          "count": 557,
+          "wins": 324,
+          "usage_rate": 2.12,
+          "win_rate": 58.17
         },
         {
-          "id": 26000057,
-          "name": "Flying Machine",
-          "count": 285,
-          "wins": 161,
-          "usage_rate": 1.09,
-          "win_rate": 56.49
+          "id": 26000024,
+          "name": "Royal Giant",
+          "count": 547,
+          "wins": 318,
+          "usage_rate": 2.08,
+          "win_rate": 58.14
+        },
+        {
+          "id": 28000024,
+          "name": "Goblin Curse",
+          "count": 546,
+          "wins": 335,
+          "usage_rate": 2.07,
+          "win_rate": 61.36
+        },
+        {
+          "id": 26000025,
+          "name": "Guards",
+          "count": 494,
+          "wins": 281,
+          "usage_rate": 1.88,
+          "win_rate": 56.88
+        },
+        {
+          "id": 26000055,
+          "name": "Mega Knight",
+          "count": 492,
+          "wins": 282,
+          "usage_rate": 1.87,
+          "win_rate": 57.32
+        },
+        {
+          "id": 26000016,
+          "name": "Prince",
+          "count": 480,
+          "wins": 278,
+          "usage_rate": 1.82,
+          "win_rate": 57.92
+        },
+        {
+          "id": 26000087,
+          "name": "Phoenix",
+          "count": 478,
+          "wins": 292,
+          "usage_rate": 1.82,
+          "win_rate": 61.09
+        },
+        {
+          "id": 27000003,
+          "name": "Inferno Tower",
+          "count": 476,
+          "wins": 273,
+          "usage_rate": 1.81,
+          "win_rate": 57.35
+        },
+        {
+          "id": 26000067,
+          "name": "Elixir Golem",
+          "count": 465,
+          "wins": 265,
+          "usage_rate": 1.77,
+          "win_rate": 56.99
         },
         {
           "id": 26000060,
           "name": "Goblin Giant",
-          "count": 284,
-          "wins": 175,
-          "usage_rate": 1.09,
-          "win_rate": 61.62
+          "count": 420,
+          "wins": 257,
+          "usage_rate": 1.6,
+          "win_rate": 61.19
         },
         {
-          "id": 26000077,
-          "name": "Monk",
+          "id": 27000008,
+          "name": "X-Bow",
+          "count": 398,
+          "wins": 220,
+          "usage_rate": 1.51,
+          "win_rate": 55.28
+        },
+        {
+          "id": 26000095,
+          "name": "Goblin Demolisher",
+          "count": 365,
+          "wins": 232,
+          "usage_rate": 1.39,
+          "win_rate": 63.56
+        },
+        {
+          "id": 26000047,
+          "name": "Royal Recruits",
+          "count": 346,
+          "wins": 207,
+          "usage_rate": 1.31,
+          "win_rate": 59.83
+        },
+        {
+          "id": 26000097,
+          "name": "Suspicious Bush",
+          "count": 317,
+          "wins": 188,
+          "usage_rate": 1.2,
+          "win_rate": 59.31
+        },
+        {
+          "id": 26000019,
+          "name": "Spear Goblins",
           "count": 277,
-          "wins": 157,
-          "usage_rate": 1.06,
-          "win_rate": 56.68
+          "wins": 182,
+          "usage_rate": 1.05,
+          "win_rate": 65.7
+        },
+        {
+          "id": 26000057,
+          "name": "Flying Machine",
+          "count": 274,
+          "wins": 167,
+          "usage_rate": 1.04,
+          "win_rate": 60.95
         },
         {
           "id": 26000051,
           "name": "Ram Rider",
-          "count": 249,
-          "wins": 144,
-          "usage_rate": 0.95,
-          "win_rate": 57.83
+          "count": 270,
+          "wins": 140,
+          "usage_rate": 1.03,
+          "win_rate": 51.85
         },
         {
-          "id": 28000025,
-          "name": "Spirit Empress",
-          "count": 212,
-          "wins": 114,
-          "usage_rate": 0.81,
-          "win_rate": 53.77
+          "id": 26000077,
+          "name": "Monk",
+          "count": 262,
+          "wins": 146,
+          "usage_rate": 1.0,
+          "win_rate": 55.73
         },
         {
           "id": 26000062,
           "name": "Magic Archer",
-          "count": 205,
-          "wins": 128,
-          "usage_rate": 0.78,
-          "win_rate": 62.44
+          "count": 235,
+          "wins": 141,
+          "usage_rate": 0.89,
+          "win_rate": 60.0
+        },
+        {
+          "id": 28000025,
+          "name": "Spirit Empress",
+          "count": 139,
+          "wins": 71,
+          "usage_rate": 0.53,
+          "win_rate": 51.08
         },
         {
           "id": 28000023,
           "name": "Void",
-          "count": 116,
-          "wins": 74,
-          "usage_rate": 0.44,
-          "win_rate": 63.79
-        },
-        {
-          "id": 28000013,
-          "name": "Clone",
-          "count": 97,
-          "wins": 60,
-          "usage_rate": 0.37,
-          "win_rate": 61.86
+          "count": 128,
+          "wins": 67,
+          "usage_rate": 0.49,
+          "win_rate": 52.34
         },
         {
           "id": 26000068,
           "name": "Battle Healer",
-          "count": 75,
-          "wins": 49,
-          "usage_rate": 0.29,
-          "win_rate": 65.33
+          "count": 108,
+          "wins": 55,
+          "usage_rate": 0.41,
+          "win_rate": 50.93
+        },
+        {
+          "id": 28000013,
+          "name": "Clone",
+          "count": 72,
+          "wins": 41,
+          "usage_rate": 0.27,
+          "win_rate": 56.94
+        },
+        {
+          "id": 28000006,
+          "name": "Mirror",
+          "count": 34,
+          "wins": 20,
+          "usage_rate": 0.13,
+          "win_rate": 58.82
         },
         {
           "id": 26000096,
           "name": "Goblin Machine",
-          "count": 30,
-          "wins": 11,
-          "usage_rate": 0.11,
-          "win_rate": 36.67
+          "count": 4,
+          "wins": 4,
+          "usage_rate": 0.02,
+          "win_rate": 100.0
         }
       ]
     }
