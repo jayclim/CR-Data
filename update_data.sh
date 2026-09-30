@@ -9,8 +9,7 @@ if [ $? -eq 0 ]; then
     echo "Data fetch successful!"
     
     # 3. Add the new data files to git
-    git add viz-dashboard/src/data/meta_snapshot.json
-    git add viz-dashboard/public/cards/
+    git add viz-dashboard/src/data/meta_snapshot.json viz-dashboard/src/data/meta_history.json
     
     # 4. Commit the changes
     timestamp=$(date "+%Y-%m-%d %H:%M:%S")

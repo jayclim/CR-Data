@@ -9,7 +9,9 @@
     "lint": "eslint",
     "update-data": "bash scripts/update_data.sh",
     "fetch-assets": "python3 scripts/fetch_assets.py",
-    "test:data": "python3 scripts/test_snapshot.py"
+    "test:data": "python3 scripts/test_snapshot.py",
+    "test:history": "node --experimental-strip-types scripts/test_card_history.ts",
+    "test:explorer": "node scripts/check_explorer.cjs"
   },
   "dependencies": {
     "@types/d3": "^7.4.3",

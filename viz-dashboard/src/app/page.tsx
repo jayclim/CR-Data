@@ -26,7 +26,7 @@ export default function Home() {
         <div>
           <h1 id="hero-title" className="page-heading">Your next deck starts here.</h1>
           <p className="section-copy mt-5">Scout the cards. Find your combo. Explore what top Clash Royale players are bringing to the arena.</p>
-          <Link prefetch={false} href="/data" className="button-primary mt-6">Explore cards & decks <ArrowRight size={17} /></Link>
+          <Link prefetch={false} href="/explore" className="button-primary mt-6">Explore the cards <ArrowRight size={17} /></Link>
         </div>
         <div className="hero-showcase">
           <div className="hero-cards">
@@ -56,7 +56,7 @@ export default function Home() {
                 <span className="text-xs text-[#a4b8ce] w-3 tabular-nums">{i + 1}</span>
                 <Image src={card.icon} alt={card.name} width={36} height={44} className="object-contain h-11 w-9" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between gap-2 text-sm"><span className="font-medium truncate">{card.name}</span><span className="tabular-nums text-[#a4b8ce]">{card.usage_rate}%</span></div>
+                  <div className="flex justify-between gap-2 text-sm"><Link prefetch={false} href={`/explore?card=${card.id}`} className="font-medium truncate hover:text-[var(--primary)] underline decoration-[#426183] underline-offset-4">{card.name}</Link><span className="tabular-nums text-[#a4b8ce]">{card.usage_rate}%</span></div>
                   <div className="h-1 bg-[#223a52] rounded mt-2"><div className="h-1 rounded bg-[#48bdff]" style={{ width: `${card.usage_rate}%` }} /></div>
                 </div>
               </div>
@@ -90,7 +90,7 @@ export default function Home() {
         <ArchetypeMatchupHeatmap specificData={metaData.archetype_matchups_specific} genericData={metaData.archetype_matchups_generic} />
       </section>
       <footer className="mt-12 border-t border-[#28415b] pt-6 section-copy text-xs">
-        <p>About the sample: decisive 1v1 Ranked and Trophy Road deck observations from sampled top players. The same battle can appear from both players’ perspectives. Archetypes are heuristic categories; new cards may be unclassified.</p>
+        <p>About the sample: decisive 1v1 Ranked and Trophy Road deck observations from sampled top players. Each sampled player’s deck counts once per battle. When both players are sampled, their decks both contribute; matchup comparisons deduplicate the battle. Archetypes are heuristic categories; new cards may be unclassified.</p>
         <p className="mt-3">Independent fan project. Not affiliated with or endorsed by Supercell. Game artwork belongs to Supercell.</p>
       </footer>
     </main>

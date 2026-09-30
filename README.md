@@ -6,7 +6,7 @@ This project consists of two parts:
 
 ## Prerequisites
 - **Python 3.10+**
-- **Node.js 18+**
+- **Node.js 24+**
 - **Clash Royale API Key**, set as `CR_PROXY_API_KEY` in `mcp-server/.env` (or in a `.env` at the repo root)
 
 ---
@@ -74,11 +74,25 @@ To fetch fresh data (e.g., daily), use the provided update script:
    
 **What this does:**
 1. Runs `viz-dashboard/scripts/fetch_meta.py` to fetch the latest top 1000 player battles and card stats.
-2. Generates a new `meta_snapshot.json`.
+2. Generates `meta_snapshot.json` and updates `meta_history.json` with the latest snapshot for the UTC day.
 3. Automatically commits and pushes the new data to GitHub.
 4. Triggers a redeploy on Vercel (if connected).
 
-*Note: You need a valid `CR_API_KEY` in `mcp-server/.env` for this to work.*
+*Note: You need a valid `CR_PROXY_API_KEY` in `mcp-server/.env` for this to work.*
+
+The GitHub workflow also refreshes these files daily at 11:00 UTC. The card explorer at `/explore` reads the saved data; browsing or selecting cards does not call the game API.
+
+History retains 90 calendar days and starts with schema version 2. Older win-rate data is not backfilled. A same-day refresh replaces that day's point. Points summarize recent battle logs, which can overlap between days; they are not daily battle totals. Each sampled player's deck is counted once per identified battle, while matchup aggregation deduplicates both players' logs. Variants remain pooled, and these results describe the sampled ranked players rather than all players.
+
+Run the offline data regression before changing the pipeline:
+
+```bash
+cd viz-dashboard
+python3 scripts/test_snapshot.py
+npm run test:history
+```
+
+The browser smoke check (`npm run test:explorer`) accepts `BASE_URL`, `PLAYWRIGHT_MODULE` (an existing Playwright installation), and `CHROME_BIN`. It verifies selection, deep links, empty search, responsive layout, and absence of game API calls.
 
 ---
 

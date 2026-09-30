@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${baseUrl}/data`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/explore`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${baseUrl}/player`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/clan`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ];
