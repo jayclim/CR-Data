@@ -125,7 +125,7 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
 
     // Color Scale for Links
     const maxVal = d3.max(data.links, d => d.value) || 1;
-    const colorScale = d3.scaleSequential(d3.interpolateBlues)
+    const colorScale = d3.scaleSequential(d3.interpolateRgb("#244965", "#48bdff"))
       .domain([0, maxVal]);
 
     // Zoom Group
@@ -200,7 +200,10 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
       .attr("x", 0)
       .attr("y", CONFIG.VISUALS.TEXT_OFFSET_Y)
       .attr("text-anchor", "middle")
-      .attr("fill", "#142a40")
+      .attr("fill", "#eaf4ff")
+      .attr("paint-order", "stroke")
+      .attr("stroke", "#0b1829")
+      .attr("stroke-width", 3)
       .attr("font-size", CONFIG.VISUALS.FONT_SIZE)
       .attr("font-family", "sans-serif")
       .attr("pointer-events", "none")
@@ -284,17 +287,17 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
   }, [data, dimensions]);
 
   return (
-    <div className="bg-[#ffffff] border border-[#e2e8f0] rounded-lg overflow-hidden h-full min-h-[400px] flex flex-col">
-      <div className="px-3 py-2 border-b border-[#e2e8f0] bg-[#f8fafc] flex justify-between items-center">
-        <h2 className="text-xs font-bold text-slate-700 normal-case tracking-normal flex items-center gap-2">
-          <span className="text-blue-500"></span> Card relationships
+    <div className="bg-[#101f33] border border-[#28415b] rounded-lg overflow-hidden h-full min-h-[400px] flex flex-col">
+      <div className="px-3 py-2 border-b border-[#28415b] bg-[#101f33] flex justify-between items-center">
+        <h2 className="text-xs font-bold text-[#eaf4ff] normal-case tracking-normal flex items-center gap-2">
+          Card relationships
         </h2>
-        <span className="text-[10px] text-slate-500 tabular-nums">
+        <span className="text-[10px] text-[#a4b8ce] tabular-nums">
           {hoveredNode ? `Highlighting: ${hoveredNode}` : 'Drag nodes to explore clusters'}
         </span>
       </div>
       
-      <div ref={containerRef} className="flex-1 relative bg-[#f4f7fa] overflow-hidden">
+      <div ref={containerRef} className="flex-1 relative network-field overflow-hidden">
         <svg 
           ref={svgRef}
           aria-label="Card co-occurrence network"
@@ -304,15 +307,15 @@ export default function MetaNetworkGraph({ synergies }: { synergies: Synergy[] }
         />
         
         {/* Legend */}
-        <div className="absolute bottom-3 right-3 bg-white/95 p-2 rounded border border-[#cbd5e1] text-[10px] text-slate-600 max-w-[200px]">
-          <p className="font-bold text-slate-800 mb-2">Played together</p>
-          <div className="h-2 w-full rounded bg-gradient-to-r from-blue-100 to-blue-700 mb-1"></div>
-          <div className="flex justify-between text-[9px] text-slate-500 tabular-nums">
+        <div className="absolute bottom-3 right-3 bg-[#101f33]/95 p-2 rounded border border-[#28415b] text-[10px] text-[#a4b8ce] max-w-[200px]">
+          <p className="font-bold text-[#eaf4ff] mb-2">Played together</p>
+          <div className="h-2 w-full rounded bg-gradient-to-r from-[#244965] to-[#48bdff] mb-1"></div>
+          <div className="flex justify-between text-[9px] text-[#a4b8ce] tabular-nums">
             <span>Weak</span>
             <span>Strong</span>
           </div>
-          <div className="mt-2 pt-2 border-t border-[#cbd5e1]">
-            <p className="font-bold text-slate-800 mb-1">How to read:</p>
+          <div className="mt-2 pt-2 border-t border-[#28415b]">
+            <p className="font-bold text-[#eaf4ff] mb-1">How to read:</p>
             <ul className="list-disc pl-3 space-y-1">
               <li>Nodes = Cards</li>
               <li>Links = Shared decks</li>
