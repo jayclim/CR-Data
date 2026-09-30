@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Card {
+  id: number;
   name: string;
   icon: string;
   usage_rate: number;
@@ -33,7 +35,7 @@ export default function CardTable({ cards }: { cards: Card[] }) {
                     <div className="relative h-11 w-9 shrink-0 rounded-md border border-[#426183] bg-[#0b1829] shadow-[inset_0_1px_#7894aa33]">
                       <Image src={card.icon} alt={card.name} fill className="object-contain p-0.5" sizes="36px" />
                     </div>
-                    <span className="text-sm font-semibold text-[var(--foreground)]">{card.name}</span>
+                    <Link prefetch={false} href={`/explore?card=${card.id}`} className="text-sm font-semibold text-[var(--foreground)] underline decoration-[#426183] underline-offset-4 hover:text-[var(--primary)]">{card.name}</Link>
                   </div>
                 </td>
                 <td className="px-4 py-2 text-right text-sm font-bold text-[#54d6b5] tabular-nums">{card.win_rate ?? 0}%</td>

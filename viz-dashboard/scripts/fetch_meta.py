@@ -6,8 +6,9 @@ import aiohttp
 import time
 import logging
 import random
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from collections import Counter
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Configure logging
@@ -195,6 +196,9 @@ async def fetch_player_battles(player_tag, session):
                 # Only decisive 1v1 games contribute to win rates.
                 if team.get("crowns", 0) == opponent.get("crowns", 0):
                     continue
+                identity = battle_identity(battle, player_tag)
+                if identity is None:
+                    continue
                 win = 0
                 if team.get("crowns", 0) > opponent.get("crowns", 0):
                     win = 1
@@ -202,10 +206,103 @@ async def fetch_player_battles(player_tag, session):
                 valid_battles.append({
                     "cards": team.get("cards", []),
                     "opponent_cards": opponent.get("cards", []),
-                    "win": win
+                    "win": win,
+                    "identity": identity,
                 })
                 
     return valid_battles[:BATTLE_LIMIT]
+
+
+def battle_identity(battle, observed_tag):
+    """Return one stable battle key plus the player whose deck was observed."""
+    try:
+        raw_time = battle["battleTime"]
+        if not isinstance(raw_time, str):
+            return None
+        try:
+            played_at = datetime.strptime(raw_time, "%Y%m%dT%H%M%S.%fZ").replace(tzinfo=timezone.utc)
+        except ValueError:
+            played_at = datetime.strptime(raw_time, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+        game_mode = battle.get("gameMode")
+        if game_mode is not None and (not isinstance(game_mode, dict) or not isinstance(game_mode.get("id"), (int, str))):
+            return None
+        mode = (battle["type"], game_mode["id"] if game_mode else None)
+        tags = (battle["team"][0]["tag"], battle["opponent"][0]["tag"])
+        if not isinstance(mode[0], str) or not mode[0].strip():
+            return None
+        if any(not isinstance(tag, str) or len(tag) < 2 or not tag.startswith("#") or not tag[1:].isalnum() for tag in (*tags, observed_tag)):
+            return None
+        tags = tuple(tag.upper() for tag in tags)
+        observed_tag = observed_tag.upper()
+        if observed_tag != tags[0] or tags[0] == tags[1]:
+            return None
+        return (played_at.isoformat(), mode, tuple(sorted(tags))), observed_tag
+    except (KeyError, IndexError, TypeError, ValueError):
+        return None
+
+
+def updated_history(path, snapshot):
+    if path.exists():
+        history = json.loads(path.read_text())
+        if (not isinstance(history, dict) or history.get("schema_version") != 2
+                or not isinstance(history.get("snapshots"), list)):
+            raise ValueError("Invalid or old meta_history.json schema; preserving existing data")
+        dates = set()
+        for entry in history["snapshots"]:
+            if (not isinstance(entry, dict) or not isinstance(entry.get("date"), str)
+                    or not isinstance(entry.get("timestamp"), str)
+                    or not isinstance(entry.get("total_players"), int)
+                    or not isinstance(entry.get("total_decks"), int)
+                    or not isinstance(entry.get("unique_battles"), int)
+                    or not isinstance(entry.get("cards"), list)):
+                raise ValueError("Malformed meta_history.json; preserving existing data")
+            try:
+                datetime.strptime(entry["date"], "%Y-%m-%d")
+                timestamp = datetime.fromisoformat(entry["timestamp"])
+            except ValueError as error:
+                raise ValueError("Malformed meta_history.json date or timestamp; preserving existing data") from error
+            if (timestamp.tzinfo is None or timestamp.utcoffset() != timedelta(0)
+                    or timestamp.date().isoformat() != entry["date"] or entry["date"] in dates):
+                raise ValueError("Invalid meta_history.json dates; preserving existing data")
+            dates.add(entry["date"])
+            if any(not isinstance(card, dict) or not {"id", "name", "count", "wins", "usage_rate", "win_rate"} <= card.keys()
+                   or not isinstance(card["id"], int) or not isinstance(card["name"], str)
+                   or not isinstance(card["count"], int) or not isinstance(card["wins"], int)
+                   or not 0 <= card["wins"] <= card["count"] for card in entry["cards"]):
+                raise ValueError("Malformed meta_history.json cards; preserving existing data")
+    else:
+        history = {"schema_version": 2, "snapshots": []}
+
+    day = snapshot["timestamp"][:10]
+    if any(old["date"] > day for old in history["snapshots"]):
+        raise ValueError("Snapshot predates existing history; preserving existing data")
+    if any(old["date"] == day and old["timestamp"] > snapshot["timestamp"] for old in history["snapshots"]):
+        raise ValueError("Snapshot predates today's history entry; preserving existing data")
+    entry = {
+        "date": day,
+        "timestamp": snapshot["timestamp"],
+        "total_players": snapshot["total_players"],
+        "total_decks": snapshot["total_decks"],
+        "unique_battles": snapshot["unique_battles"],
+        "cards": [{key: card[key] for key in ("id", "name", "count", "wins", "usage_rate", "win_rate")}
+                  for card in snapshot["cards"]],
+    }
+    # ponytail: 90 calendar days cap keeps this checked-in file small; expand only if longer trends are needed.
+    cutoff = (datetime.strptime(day, "%Y-%m-%d") - timedelta(days=89)).date().isoformat()
+    history["snapshots"] = sorted(
+        [old for old in history["snapshots"] if cutoff <= old["date"] < day] + [entry],
+        key=lambda old: old["date"],
+    )
+    return history
+
+
+def atomic_json(path, data):
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    try:
+        temporary.write_text(json.dumps(data, indent=2))
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 async def fetch_clan_location(clan_tag, session):
     if not clan_tag: return "Unknown"
@@ -273,6 +370,7 @@ async def main():
         archetype_counts_generic = Counter()
         deck_counts = Counter()
         deck_variant_counts = {} 
+        observed_card_info = {}
         location_counts = Counter()
         matchup_stats_specific = {} # (my, opp) -> stats
         matchup_stats_generic = {} # (my, opp) -> stats
@@ -280,6 +378,8 @@ async def main():
         regional_archetypes_specific = {}
         regional_archetypes_generic = {}
         total_decks = 0
+        seen_observations = set()
+        seen_battles = set()
         
         clan_cache = {}
         sem = asyncio.Semaphore(MAX_CONCURRENCY)
@@ -328,11 +428,20 @@ async def main():
                 for battle_record in decks:
                     # ... Data Processing Logic ...
                     if not battle_record: continue
+                    battle_key, observed_tag = battle_record["identity"]
+                    observation_key = (battle_key, observed_tag)
+                    if observation_key in seen_observations:
+                        continue
+                    seen_observations.add(observation_key)
+                    new_battle = battle_key not in seen_battles
+                    seen_battles.add(battle_key)
                     deck = battle_record["cards"]
                     opp_deck = battle_record.get("opponent_cards", [])
                     is_win = battle_record["win"]
                     
                     card_names = [c["name"] for c in deck]
+                    for card in deck:
+                        observed_card_info.setdefault(card["name"], card)
                     card_counts.update(card_names)
                     if is_win:
                         card_wins.update(card_names)
@@ -413,7 +522,7 @@ async def main():
                     total_decks += 1
                     
                     # Detect Opponent Archetype & Track Matchup
-                    if detected_specific != "Unknown" and opp_deck:
+                    if new_battle and detected_specific != "Unknown" and opp_deck:
                          opp_specific, opp_generic = determine_archetype(opp_deck)
                          
                          if opp_specific != "Unknown":
@@ -423,12 +532,16 @@ async def main():
                              matchup_stats_specific[(detected_specific, opp_specific)]['total'] += 1
                              matchup_stats_specific[(detected_specific, opp_specific)]['wins'] += is_win
                              
-                             # Mirror Specific
+                             # Mirror Specific: one directional row per side of the battle.
                              opp_win = 1 - int(is_win)
-                             if (opp_specific, detected_specific) not in matchup_stats_specific:
-                                 matchup_stats_specific[(opp_specific, detected_specific)] = {"wins": 0, "total": 0}
-                             matchup_stats_specific[(opp_specific, detected_specific)]['total'] += 1
-                             matchup_stats_specific[(opp_specific, detected_specific)]['wins'] += opp_win
+                             if opp_specific != detected_specific:
+                                 if (opp_specific, detected_specific) not in matchup_stats_specific:
+                                     matchup_stats_specific[(opp_specific, detected_specific)] = {"wins": 0, "total": 0}
+                                 matchup_stats_specific[(opp_specific, detected_specific)]['total'] += 1
+                                 matchup_stats_specific[(opp_specific, detected_specific)]['wins'] += opp_win
+                             else:
+                                 matchup_stats_specific[(detected_specific, opp_specific)]['total'] += 1
+                                 matchup_stats_specific[(detected_specific, opp_specific)]['wins'] += opp_win
                              
                              # Generic Matchups
                              if (detected_generic, opp_generic) not in matchup_stats_generic:
@@ -437,10 +550,14 @@ async def main():
                              matchup_stats_generic[(detected_generic, opp_generic)]['wins'] += is_win
                              
                              # Mirror Generic
-                             if (opp_generic, detected_generic) not in matchup_stats_generic:
-                                 matchup_stats_generic[(opp_generic, detected_generic)] = {"wins": 0, "total": 0}
-                             matchup_stats_generic[(opp_generic, detected_generic)]['total'] += 1
-                             matchup_stats_generic[(opp_generic, detected_generic)]['wins'] += opp_win
+                             if opp_generic != detected_generic:
+                                 if (opp_generic, detected_generic) not in matchup_stats_generic:
+                                     matchup_stats_generic[(opp_generic, detected_generic)] = {"wins": 0, "total": 0}
+                                 matchup_stats_generic[(opp_generic, detected_generic)]['total'] += 1
+                                 matchup_stats_generic[(opp_generic, detected_generic)]['wins'] += opp_win
+                             else:
+                                 matchup_stats_generic[(detected_generic, opp_generic)]['total'] += 1
+                                 matchup_stats_generic[(detected_generic, opp_generic)]['wins'] += opp_win
 
                     if player_loc and player_loc != "Unknown" and detected_specific != "Unknown":
                         regional_archetypes_specific[player_loc][detected_specific] += 1
@@ -508,19 +625,27 @@ async def main():
                 "cards": deck_cards,
                 "avg_elixir": round(avg_elixir / 8, 1),
                 "count": count,
+                "wins": deck_wins[deck_tuple],
                 "usage_rate": round((count / total_decks) * 100, 2),
                 "win_rate": round(deck_wins[deck_tuple] / count * 100, 1)
             })
 
-        top_cards = []
-        for name, count in card_counts.most_common(50):
-            card_info = card_map.get(name, {"name": name, "key": "unknown", "icon": ""})
-            top_cards.append({
+        cards = []
+        for name, count in card_counts.most_common():
+            observed = observed_card_info[name]
+            card_info = card_map.get(name, {"name": name, "id": observed.get("id"),
+                                            "icon": observed.get("iconUrls", {}).get("medium", ""),
+                                            "elixir": observed.get("elixirCost", 0)})
+            if card_info.get("id") is None:
+                raise ValueError(f"Observed card {name!r} has no ID; preserving existing data")
+            cards.append({
                 **card_info,
                 "count": count,
+                "wins": card_wins[name],
                 "usage_rate": round((count / total_decks) * 100, 2),
                 "win_rate": round(card_wins[name] / count * 100, 2)
             })
+        top_cards = cards[:50]
 
         top_synergies = []
         for pair, count in synergy_counts.most_common(100):
@@ -671,11 +796,12 @@ async def main():
         def process_matchups(stats_dict):
             processed = []
             for (my_arch, opp_arch), stats in stats_dict.items():
-                if stats['total'] < 30: continue # Minimum sample size
+                battle_count = stats['total'] // 2 if my_arch == opp_arch else stats['total']
+                if battle_count < 30: continue # Minimum unique battles
                 
                 p_hat = stats['wins'] / stats['total']
                 p_0 = 0.5 # Null hypothesis: 50% win rate
-                n = stats['total']
+                n = battle_count
                 
                 # Z = (p_hat - p_0) / sqrt(p_0 * (1 - p_0) / n)
                 denominator = math.sqrt((p_0 * (1 - p_0)) / n)
@@ -685,7 +811,9 @@ async def main():
                     "archetype": my_arch,
                     "opponent": opp_arch,
                     "win_rate": round(p_hat * 100, 1),
-                    "total": n,
+                    "wins": stats["wins"],
+                    "total": stats["total"],
+                    "battle_count": battle_count,
                     "z_score": round(z_score, 2),
                     "significant": abs(z_score) > 1.96 # 95% confidence
                 })
@@ -695,10 +823,13 @@ async def main():
         processed_matchups_generic = process_matchups(matchup_stats_generic)
 
         output_data = {
+            "schema_version": 2,
             "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "methodology": "Decisive 1v1 PvP and Ranked deck observations from sampled top players. Repeated battles across players can appear twice. Card and deck win rates use observed outcomes; variants are pooled. Clan location is a regional proxy, not player residence.",
+            "methodology": "Decisive 1v1 PvP and Ranked deck observations from sampled top players. Each player's deck is counted once per identified battle; when both sampled players appear, both card and deck observations count. unique_battles is the number of distinct identified games. Matchups aggregate each game once and report both sides; self-matchups have a 50% win rate by definition and their two sides are not independent battles. Matchup battle_count and significance use distinct games. Card and deck win rates use observed outcomes; variants are pooled. Clan location is a regional proxy, not player residence.",
             "total_players": len(top_players),
             "total_decks": total_decks,
+            "unique_battles": len(seen_battles),
+            "cards": cards,
             "top_cards": top_cards,
             "top_decks": top_decks,
             "top_synergies": top_synergies,
@@ -731,14 +862,13 @@ async def main():
             sys.exit(1)
 
         os.makedirs(DATA_DIR, exist_ok=True)
-        output_file = os.path.join(DATA_DIR, "meta_snapshot.json")
+        output_file = Path(DATA_DIR, "meta_snapshot.json")
+        history_file = Path(DATA_DIR, "meta_history.json")
+        history = updated_history(history_file, output_data)
+        atomic_json(history_file, history)
+        atomic_json(output_file, output_data)
 
-        temporary_file = output_file + '.tmp'
-        with open(temporary_file, 'w') as f:
-            json.dump(output_data, f, indent=2)
-        os.replace(temporary_file, output_file)
-
-        logger.info(f"Data saved to {output_file}")
+        logger.info("Data saved to %s and %s", output_file, history_file)
 
 if __name__ == "__main__":
     if not CR_API_KEY:

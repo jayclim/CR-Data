@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Crown, ArrowUpRight } from 'lucide-react';
 
-const links = [{ href: '/', label: 'Overview' }, { href: '/data', label: 'Cards & decks' }];
+const links = [{ href: '/', label: 'Overview' }, { href: '/data', label: 'Cards & decks' }, { href: '/explore', label: 'Card explorer' }];
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -15,7 +15,7 @@ export default function Navbar() {
           <span className="grid place-items-center w-9 h-9 rounded-lg bg-[#ffd166] text-[#182334] shadow-[0_3px_0_#aa701e]"><Crown size={21} /></span>
           Royale <span className="font-normal text-[#a4b8ce] -ml-2">Index</span>
         </Link>
-        <div className="flex gap-1 sm:gap-3 items-center text-sm">
+        <div className="flex gap-1 sm:gap-3 items-center text-xs sm:text-sm">
           {links.map(link => <Link prefetch={false} key={link.href} href={link.href} aria-current={pathname === link.href ? 'page' : undefined} className={`px-3 py-2 rounded-md ${pathname === link.href ? 'bg-[#183b58] text-[#70cdff] font-semibold' : 'text-[#a4b8ce] hover:bg-[#101f33]'}`}>{link.label}</Link>)}
           <a href="https://supercell.com/en/games/clashroyale/blog/" target="_blank" rel="noreferrer" className="hidden sm:flex items-center gap-1 text-[#a4b8ce] pl-3">Game updates <ArrowUpRight size={14} /></a>
         </div>

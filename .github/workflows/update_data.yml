@@ -24,6 +24,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests python-dotenv aiohttp
 
+      - name: Run offline snapshot regression
+        run: python viz-dashboard/scripts/test_snapshot.py
+
       - name: Run Data Fetch Script
         env:
           CR_PROXY_API_KEY: ${{ secrets.CR_PROXY_API_KEY }}
@@ -42,7 +45,7 @@ jobs:
           
           # Add the data file. Card icons are served from the RoyaleAPI CDN, so
           # there are no longer any local card images to commit.
-          git add viz-dashboard/src/data/meta_snapshot.json
+          git add viz-dashboard/src/data/meta_snapshot.json viz-dashboard/src/data/meta_history.json
 
           # Commit if there are changes
           git commit -m "chore: update meta data [skip ci]" || echo "No changes to commit"
