@@ -15,7 +15,7 @@ export default function DataPage() {
       <DeckList decks={metaData.top_decks} />
       <section aria-label="Leaderboards"><LeaderboardList players={metaData.leaderboards.players} clans={metaData.leaderboards.clans} /></section>
       <section id="card-stats" className="scroll-mt-24"><CardTable cards={metaData.top_cards} /></section>
-      <p className="section-copy text-xs">Card and deck win rates pool evolution and hero variants. Deck artwork shows the most common observed variant. Live player and clan lookup is currently unavailable.</p>
+      <p className="section-copy border-t border-[var(--card-border)] pt-5 text-xs">Card and deck win rates pool evolution and hero variants. Deck artwork shows the most common observed variant. Live player and clan lookup is currently unavailable.</p>
     </main>
   );
 }

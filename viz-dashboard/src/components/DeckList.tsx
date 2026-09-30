@@ -19,62 +19,34 @@ interface Deck {
 export default function DeckList({ decks }: { decks: Deck[] }) {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center px-2">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <span className="text-blue-500"></span> Popular Decks
-        </h2>
-        <span className="text-xs text-slate-500 normal-case font-bold tracking-normal">Ranked by observed usage</span>
+      <div className="flex flex-wrap items-end justify-between gap-2 px-1">
+        <h2 className="text-xl font-bold text-[var(--foreground)]">Popular Decks</h2>
+        <span className="text-xs text-[var(--muted)]">Ranked by observed usage</span>
       </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {decks.map((deck, index) => (
-          <div key={index} className="bg-[#ffffff] border border-[#e2e8f0] rounded-lg overflow-hidden hover:border-slate-400 transition-colors group">
-            {/* Deck Header Stats */}
-            <div className="p-3 border-b border-[#e2e8f0] bg-[#f8fafc]">
-              <div className="flex justify-between items-center text-xs mb-2">
-                <span className="font-bold text-slate-700">Deck sample</span>
-                <span className="text-[#64748b] tabular-nums">#{index + 1}</span>
+          <div key={index} className="group overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] shadow-[0_16px_32px_#030b1780] transition-colors hover:border-[#48bdff]">
+            <div className="border-b border-[var(--card-border)] bg-[#152942] p-4">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <span className="text-sm font-bold text-[var(--foreground)]">Deck sample</span>
+                <span className="rounded-md border border-[#b88e3d] bg-[#4a3b23] px-2 py-0.5 text-xs font-black text-[#ffd166] tabular-nums">#{index + 1}</span>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-xs normal-case tracking-wide text-slate-500">
-                <div className="flex flex-col">
-                  <span>Elixir</span>
-                  <span className="text-teal-700 font-bold text-sm">{deck.avg_elixir}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span>Win Rate</span>
-                  <span className="text-emerald-700 font-bold text-sm">{deck.win_rate}%</span>
-                </div>
-                <div className="flex flex-col">
-                  <span>Usage</span>
-                  <span className="text-blue-700 font-bold text-sm">{deck.usage_rate}%</span>
-                </div>
+              <div className="grid grid-cols-3 gap-2 text-xs text-[var(--muted)]">
+                <div className="flex flex-col gap-0.5"><span>Elixir</span><span className="text-base font-bold text-[#48bdff] tabular-nums">{deck.avg_elixir}</span></div>
+                <div className="flex flex-col gap-0.5"><span>Win rate</span><span className="text-base font-bold text-[#54d6b5] tabular-nums">{deck.win_rate}%</span></div>
+                <div className="flex flex-col gap-0.5"><span>Usage</span><span className="text-base font-bold text-[#ffd166] tabular-nums">{deck.usage_rate}%</span></div>
               </div>
             </div>
 
-            {/* Cards Grid */}
-            <div className="p-2 grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-4 gap-2 p-3">
               {deck.cards.map((card, i) => (
-                <div key={i} className="relative aspect-[3/4] bg-[#f4f7fa] rounded border border-[#e2e8f0] overflow-hidden">
-                  <Image
-                    src={card.icon}
-                    alt={card.name}
-                    fill
-                    className="object-contain p-0.5"
-                    sizes="(max-width: 768px) 25vw, 10vw"
-                  />
-                  <div className="absolute bottom-0 right-0 bg-white/95 text-[10px] px-1 text-slate-600 tabular-nums rounded-tl leading-tight">
-                    {card.elixir}
-                  </div>
+                <div key={i} className={`relative aspect-[3/4] overflow-hidden rounded-md border bg-[linear-gradient(145deg,#25456b,#0b1829_75%)] shadow-[inset_0_1px_#ffffff38,0_3px_0_#07111f] ${card.is_evo ? 'border-[#ba7dff]' : card.is_hero ? 'border-[#ffd166]' : 'border-[#426183]'}`}>
+                  <Image src={card.icon} alt={card.name} fill className="object-contain p-0.5" sizes="(max-width: 768px) 25vw, 10vw" />
+                  <span className="absolute bottom-0 right-0 rounded-tl-md border-l border-t border-[#426183] bg-[#081321]/95 px-1.5 text-[10px] font-bold leading-4 text-[#eaf4ff] tabular-nums">{card.elixir}</span>
                 </div>
               ))}
             </div>
-            
-            {/* Action Bar */}
-            {/* <div className="px-2 pb-2">
-               <button className="w-full text-xs bg-[#e2e8f0] text-slate-700 py-1.5 rounded hover:bg-[#cbd5e1] transition-colors font-medium border border-[#cbd5e1]">
-                 View Details
-               </button>
-            </div> */}
           </div>
         ))}
       </div>
